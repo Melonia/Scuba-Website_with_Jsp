@@ -1,0 +1,2 @@
+﻿release
+2020.07.15.17:44_권재우_V.2.7(release 최초작성, css.textarea수정, background gif 삽입, 인사말 수정)
