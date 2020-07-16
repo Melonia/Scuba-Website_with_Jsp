@@ -1,2 +1,3 @@
 ﻿release
 2020.07.15.17:44_권재우_V.2.7(release 최초작성, css.textarea수정, background gif 삽입, 인사말 수정)
+2020.07.16.12:42_권재우_V.2.8(edu.jsp 교육신청란 onclick Focus 기능 추가, index.jsp product1,2,3 링크 설정 추가, login, join 유효성검사 추가)
