@@ -12,4 +12,10 @@
 	      name="jdbc/myoracle" password="1234" 
 	      type="javax.sql.DataSource" url="jdbc:oracle:thin:@localhost:1521:XE" 
 	      username="test"/>
-  
+
+[大永네 집] 
+<Resource name="jdbc/myoracle" auth="Container"
+              type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
+              url="jdbc:oracle:thin:@127.0.0.1:1521:orcl"
+              username="sc" password="12" maxTotal="20" maxIdle="10"
+              maxWaitMillis="-1"/>  
