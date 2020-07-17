@@ -3,8 +3,4 @@ drop sequence board1_seq;
 drop sequence board2_seq;
 drop sequence board3_seq;
 drop sequence board4_seq;
-drop sequence board5_seq;
-drop sequence board6_seq;
-drop sequence board7_seq;
-drop sequence board8_seq;
 commit;

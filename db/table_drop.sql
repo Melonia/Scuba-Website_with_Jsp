@@ -3,8 +3,4 @@ drop table board1;
 drop table board2;
 drop table board3;
 drop table board4;
-drop table board5;
-drop table board6;
-drop table board7;
-drop table board8;
 commit;
