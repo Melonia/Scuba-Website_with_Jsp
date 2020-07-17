@@ -2,4 +2,7 @@
 2020.07.15.17:44_권재우_V.2.7(release 최초작성, css.textarea수정, background gif 삽입, 인사말 수정)
 2020.07.16.12:42_권재우_V.2.8(edu.jsp 교육신청란 onclick Focus 기능 추가, index.jsp product1,2,3 링크 설정 추가, login, join 유효성검사 추가)
 2020.07.16.16:09_이주호_V.2.9(header.jsp 로그인란 MemberDAO, MemberVO, LoginServlet 수정, DB연결 로그인 및 로그인 실패 시 메시지)
-
+2020.07.16.22.40_이주호_V.3.0(회원가입 완료 alert 추가, 회원 정보 삽입 메소드 작성)
+2020.07.17.12:37_이주호_V.3.1(회원가입,데이터베이스)
+2020.07.17.13:00_권재우_V.3.2(index페이지 메인 image 수정, stone 생상 수정, config 내용 추가)
+2020.07.17.14:00_김대영_V.3.3(DB 테이블 삭제,이름 변경,ER 수정, 정의서 수정)
