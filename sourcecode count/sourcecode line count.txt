@@ -1,0 +1,6381 @@
+﻿package com.scuba.controller;
+
+import com.scuba.controller.action.Action;
+import com.scuba.controller.action.Board1ListAction;
+import com.scuba.controller.action.Board1WriteAction;
+import com.scuba.controller.action.Board2ListAction;
+import com.scuba.controller.action.Board2WriteAction;
+import com.scuba.controller.action.Board2WriteFormAction;
+import com.scuba.controller.action.Board3ListAction;
+import com.scuba.controller.action.Board3WriteAction;
+import com.scuba.controller.action.Board3WriteFormAction;
+import com.scuba.controller.action.Board4ListAction;
+import com.scuba.controller.action.Board4WriteAction;
+import com.scuba.controller.action.Board4WriteFormAction;
+import com.scuba.controller.action.BulletinListAction;
+import com.scuba.controller.action.BulletinWriteAction;
+import com.scuba.controller.action.LogoutAction;
+
+public class ActionFactory {
+	private static ActionFactory instance = new ActionFactory();
+	
+	private ActionFactory() {
+		super();
+	}
+	
+	public static ActionFactory getInstance() {
+		return instance;
+	}
+	
+	public Action getAction(String command) {
+		Action action = null;
+		System.out.println("ActionFactory:"+command);
+		if(command.equals("board1_list")) {
+			action = new Board1ListAction();
+		}
+		if(command.equals("board1_write")) {
+			action = new Board1WriteAction();
+		}
+		if(command.equals("board2_list")) {
+			action = new Board2ListAction();
+		}
+		if(command.equals("board2_write_form")) {
+			action = new Board2WriteFormAction();
+		}
+		if(command.equals("board2_write")) {
+			action = new Board2WriteAction();
+		}
+		if(command.equals("logout")){
+			action = new LogoutAction();
+		}
+		if(command.equals("board3_write_form")) {
+			action = new Board3WriteFormAction();
+		}
+		if(command.equals("board3_write")) {
+			action = new Board3WriteAction();
+		}
+		if(command.equals("board3_list")) {
+			action = new Board3ListAction();
+		}
+		if(command.equals("board4_list")) {
+			action = new Board4ListAction();
+		}
+		if(command.equals("board4_write_form")) {
+			action = new Board4WriteFormAction();
+		}
+		if(command.equals("board4_write")) {
+			action = new Board4WriteAction();
+		}
+		if(command.equals("bulletin_write")) {
+			action = new BulletinWriteAction();
+		}
+		if(command.equals("bulletin_list")) {
+			action = new BulletinListAction();
+		}
+		return action;
+	}
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.controller.action.Action;
+
+/**
+ * Servlet implementation class Board1Servlet
+ */
+@WebServlet("/BoardServlet")
+public class BoardServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public BoardServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String command = request.getParameter("command");
+		System.out.println("BoardServlet�� ��û���� ���:"+command);
+		
+		ActionFactory af = ActionFactory.getInstance();
+		Action action = af.getAction(command);
+		
+		if(action != null) {
+			action.execute(request, response);
+		}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		request.setCharacterEncoding("utf-8");
+		doGet(request, response);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.scuba.controller.action.BulletinWriteAction;
+
+/**
+ * Servlet implementation class BulletinServlet
+ */
+@WebServlet("/bulletin.do")
+public class BulletinServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public BulletinServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		request.setCharacterEncoding("utf-8");
+		ServletContext context = getServletContext();
+		String path = context.getRealPath("upload");
+		String encType = "utf-8";
+		int sizeLimit = 20*1024*1024;
+		
+		MultipartRequest multi = new MultipartRequest(
+				request,
+				path,
+				sizeLimit,
+				encType,
+				new DefaultFileRenamePolicy()
+				);
+		
+		System.out.println("파일 저장 경로:"+path);
+		Enumeration files = multi.getFileNames();
+		
+		while(files.hasMoreElements()) {
+			String file = (String) files.nextElement();
+			String file_name = multi.getFilesystemName(file);
+			System.out.println("업로드하는 파일명:"+file_name);
+		}
+		
+		request.setAttribute("pictureurl", multi.getFilesystemName("file"));
+		request.setAttribute("upload", "complete");
+		
+		new BulletinWriteAction().execute(request,response);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.MemberDAO;
+import com.scuba.dto.MemberVO;
+
+/**
+ * Servlet implementation class JoinServlet
+ */
+@WebServlet("/join.do")
+public class JoinServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public JoinServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String url = "jsp/login.jsp?form=join";
+		
+		response.sendRedirect(url);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String url = null;
+		request.setCharacterEncoding("utf-8");
+		String userid = request.getParameter("userid2");
+		String pwd = request.getParameter("pwd2");
+		String name = request.getParameter("name");
+		int sex = Integer.parseInt(request.getParameter("sex"));
+		String tel = request.getParameter("tel");
+		String phone = request.getParameter("phone");
+		String email = request.getParameter("email");
+		String address = request.getParameter("address");
+		
+		MemberVO mVo = new MemberVO();
+		mVo.setUserid(userid);
+		mVo.setPwd(pwd);
+		mVo.setName(name);
+		mVo.setSex(sex);
+		mVo.setTel(tel);
+		mVo.setPhone(phone);
+		mVo.setEmail(email);
+		mVo.setAddress(address);
+		
+		System.out.println(mVo);
+		MemberDAO mDao = MemberDAO.getInstance();
+		int result = mDao.insertMember(mVo);
+		if(result==1) {
+			url = "jsp/index.jsp?join_complete="+URLEncoder.encode("ȸ�������� �Ϸ�Ǿ����ϴ�.","utf-8");
+		}
+		else {
+			url = "jsp/login.jsp?form=join&join_complete="+URLEncoder.encode("ȸ�����Կ� �����Ͽ����ϴ�.","utf-8");
+		}
+		response.sendRedirect(url);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.MemberDAO;
+import com.scuba.dto.MemberVO;
+
+/**
+ * Servlet implementation class LoginServlet
+ */
+@WebServlet("/login.do")
+public class LoginServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+    /**
+     * Default constructor. 
+     */
+    public LoginServlet() {
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String url = "jsp/login.jsp?form=login";
+		
+		response.sendRedirect(url);
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		String url = null;
+		String userid = request.getParameter("userid1");
+		String pwd = request.getParameter("pwd1");
+		
+		MemberDAO mDao = MemberDAO.getInstance();
+		int result = mDao.userCheck(userid,pwd);
+		
+		if(result == 1) {
+		    MemberVO mVo = new MemberVO();
+		    mVo = mDao.selectByUserid(userid);
+			HttpSession session = request.getSession();
+			session.setAttribute("loginUser",mVo);	
+			url = "jsp/index.jsp";
+		}else if(result == 0){
+			url = "jsp/login.jsp?form=login&code=0";
+		}else {
+			url = "jsp/login.jsp?form=login&code=-1";
+		}
+		
+		response.sendRedirect(url);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.scuba.controller.action.Board3WriteAction;
+
+/**
+ * Servlet implementation class Upload2Servlet
+ */
+@WebServlet("/upload2.do")
+public class Upload2Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Upload2Servlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		ServletContext context = getServletContext();
+		String path = context.getRealPath("upload");
+		String encType = "utf-8";
+		int sizeLimit = 20*1024*1024;
+		
+		MultipartRequest multi = new MultipartRequest(
+				request,
+				path,
+				sizeLimit,
+				encType,
+				new DefaultFileRenamePolicy()
+				);
+		
+		System.out.println("���� ���� ���:"+path);
+		Enumeration files = multi.getFileNames();
+		
+		while(files.hasMoreElements()) {
+			String file = (String) files.nextElement();
+			String file_name = multi.getFilesystemName(file);
+			System.out.println("���ε�� ���ϸ�:"+file_name);
+		}
+		String userid =multi.getParameter("userid");
+		String name = multi.getParameter("name");
+		String pass = multi.getParameter("pass");
+		String title = multi.getParameter("title");
+		String content = multi.getParameter("content");
+		request.setAttribute("userid", userid);
+		request.setAttribute("name", name);
+		request.setAttribute("pass", pass);
+		request.setAttribute("title", title);
+		request.setAttribute("content",content);
+		request.setAttribute("upload", "complete");
+		request.setAttribute("pictureurl1", multi.getFilesystemName("file1"));
+		request.setAttribute("pictureurl2", multi.getFilesystemName("file2"));
+		new Board3WriteAction().execute(request,response);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.scuba.controller.action.Board4WriteAction;
+
+/**
+ * Servlet implementation class Upload2Servlet
+ */
+@WebServlet("/upload3.do")
+public class Upload3Servlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Upload3Servlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		request.setCharacterEncoding("utf-8");
+		
+		ServletContext context = getServletContext();
+		String path = context.getRealPath("upload");
+		String encType = "utf-8";
+		int sizeLimit = 20*1024*1024;
+		System.out.println("���� ���� ���:"+path);
+		MultipartRequest multi = new MultipartRequest(
+				request,
+				path,
+				sizeLimit,
+				encType,
+				new DefaultFileRenamePolicy()
+				);
+		
+		System.out.println("���� ���� ���:"+path);
+		Enumeration files = multi.getFileNames();
+		
+		while(files.hasMoreElements()) {
+			String file = (String) files.nextElement();
+			String file_name = multi.getFilesystemName(file);
+			System.out.println("���ε�� ���ϸ�:"+file_name);
+		}
+		
+		String userid =multi.getParameter("userid");
+		String name = multi.getParameter("name");
+		String pass = multi.getParameter("pass");
+		String title = multi.getParameter("title");
+		String content = multi.getParameter("content");
+		request.setAttribute("userid", userid);
+		request.setAttribute("name", name);
+		request.setAttribute("pass", pass);
+		request.setAttribute("title", title);
+		request.setAttribute("content",content);
+		request.setAttribute("upload", "complete");
+		request.setAttribute("pictureurl1", multi.getFilesystemName("file1"));
+		request.setAttribute("pictureurl2", multi.getFilesystemName("file2"));
+		
+		new Board4WriteAction().execute(request,response);
+	}
+
+}
+package com.scuba.controller;
+
+import java.io.IOException;
+import java.util.Enumeration;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+import com.scuba.controller.action.Board2WriteAction;
+
+/**
+ * Servlet implementation class UploadServlet
+ */
+@WebServlet("/upload.do")
+public class UploadServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public UploadServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		request.setCharacterEncoding("utf-8");
+		
+		ServletContext context = getServletContext();
+		String path = context.getRealPath("upload");
+		String encType = "utf-8";
+		int sizeLimit = 20*1024*1024;
+		
+		MultipartRequest multi = new MultipartRequest(
+				request,
+				path,
+				sizeLimit,
+				encType,
+				new DefaultFileRenamePolicy()
+				);
+		
+		System.out.println("���� ���� ���:"+path);
+		Enumeration files = multi.getFileNames();
+		
+		while(files.hasMoreElements()) {
+			String file = (String) files.nextElement();
+			String file_name = multi.getFilesystemName(file);
+			System.out.println("���ε�� ���ϸ�:"+file_name);
+		}
+		String userid =multi.getParameter("userid");
+		String name = multi.getParameter("name");
+		String pass = multi.getParameter("pass");
+		String title = multi.getParameter("title");
+		String content = multi.getParameter("content");
+		request.setAttribute("userid", userid);
+		request.setAttribute("name", name);
+		request.setAttribute("pass", pass);
+		request.setAttribute("title", title);
+		request.setAttribute("content",content);
+		request.setAttribute("upload", "complete");
+		request.setAttribute("pictureurl1", multi.getFilesystemName("file1"));
+		request.setAttribute("pictureurl2", multi.getFilesystemName("file2"));
+		new Board2WriteAction().execute(request,response);
+	}
+
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public interface Action {
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+			throws ServletException, IOException;
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.Board1DAO;
+import com.scuba.dto.Board1VO;
+
+public class Board1ListAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/edu.jsp?command=view_list";
+			Board1DAO bDao = Board1DAO.getInstance();
+			
+			List<Board1VO> boardList = bDao.selectAllBoards();
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("boardList", boardList);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.Board1DAO;
+import com.scuba.dto.Board1VO;
+
+public class Board1WriteAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "BoardServlet?command=board1_list";
+			
+			request.setCharacterEncoding("utf-8");
+			Board1VO bVo = new Board1VO();
+			
+			bVo.setTitle(request.getParameter("title"));
+			bVo.setPass(request.getParameter("pass"));
+			bVo.setName(request.getParameter("name"));
+			bVo.setPhone(request.getParameter("phone"));
+			if(request.getParameter("space")==null) {
+				bVo.setSpace(-1);
+			}
+			else {
+				bVo.setSpace(Integer.parseInt(request.getParameter("space")));
+			}
+			
+			if(request.getParameter("subject")==null) {
+				bVo.setSubject(-1);
+			}
+			else {
+				bVo.setSubject(Integer.parseInt(request.getParameter("subject")));
+			}
+			
+			if(request.getParameter("pack")==null) {
+				bVo.setPack(-1);
+			}
+			else {
+				bVo.setPack(Integer.parseInt(request.getParameter("pack")));
+			}
+			
+			if(request.getParameter("time")==null) {
+				bVo.setTime(-1);
+			}
+			else {
+				bVo.setTime(Integer.parseInt(request.getParameter("time")));
+			}
+			
+			Board1DAO bDao = Board1DAO.getInstance();
+			bDao.insertBoard(bVo);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.Board2DAO;
+import com.scuba.dto.Board2VO;
+
+public class Board2ListAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/post.jsp?command=view_list";
+			Board2DAO bDao = Board2DAO.getInstance();
+			
+			List<Board2VO> boardList = bDao.selectAllBoards();
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("boardList2", boardList);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.Board2DAO;
+import com.scuba.dto.Board2VO;
+
+public class Board2WriteAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/post.jsp";
+			
+			request.setCharacterEncoding("utf-8");
+			
+			if(request.getAttribute("upload")==null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/upload.do");
+				dispatcher.forward(request, response);
+			}
+			else {
+				
+				Board2VO bVo = new Board2VO();
+			
+				bVo.setUserid((String)request.getAttribute("userid"));
+				bVo.setName((String)request.getAttribute("name"));
+				bVo.setPass((String)request.getAttribute("pass"));
+				bVo.setTitle((String)request.getAttribute("title"));
+			if((String)request.getAttribute("pictureurl1")==null) {
+				bVo.setPictureurl1("no-image");
+			}
+			else {
+				bVo.setPictureurl1((String)request.getAttribute("pictureurl1"));
+			}
+			if((String)request.getAttribute("pictureurl2")==null) {
+				bVo.setPictureurl2("no-image");
+			}
+			else {
+				bVo.setPictureurl2((String)request.getAttribute("pictureurl2"));
+			}
+			bVo.setContent((String)request.getAttribute("content"));
+			
+			System.out.println(bVo);
+			Board2DAO bDao = Board2DAO.getInstance();
+			bDao.insertBoard(bVo);
+			
+			response.sendRedirect(url);
+		}
+	}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dto.MemberVO;
+
+public class Board2WriteFormAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/post.jsp?command=view_application";
+			
+			HttpSession session = request.getSession();
+			MemberVO user = (MemberVO)session.getAttribute("loginUser");
+			if(user==null) {
+				url = "jsp/login.jsp?form=login&alarm=need";
+			}
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.Board3DAO;
+import com.scuba.dto.Board3VO;
+
+public class Board3ListAction implements Action {
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/goods.jsp?command=view_list";
+			Board3DAO bDao = Board3DAO.getInstance();
+			
+			List<Board3VO> boardList = bDao.selectAllBoards();
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("boardList3", boardList);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.Board3DAO;
+import com.scuba.dto.Board3VO;
+
+public class Board3WriteAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/goods.jsp";
+			
+			request.setCharacterEncoding("utf-8");
+			
+			if(request.getAttribute("upload")==null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/upload2.do");
+				dispatcher.forward(request, response);
+			}
+			else {
+				
+				Board3VO bVo = new Board3VO();
+			
+				bVo.setUserid((String)request.getAttribute("userid"));
+				bVo.setName((String)request.getAttribute("name"));
+				bVo.setPass((String)request.getAttribute("pass"));
+				bVo.setTitle((String)request.getAttribute("title"));
+			if((String)request.getAttribute("pictureurl1")==null) {
+				bVo.setPictureurl1("no-image");
+			}
+			else {
+				bVo.setPictureurl1((String)request.getAttribute("pictureurl1"));
+			}
+			if((String)request.getAttribute("pictureurl2")==null) {
+				bVo.setPictureurl2("no-image");
+			}
+			else {
+				bVo.setPictureurl2((String)request.getAttribute("pictureurl2"));
+			}
+			bVo.setContent((String)request.getAttribute("content"));
+			
+			System.out.println(bVo);
+			Board3DAO bDao = Board3DAO.getInstance();
+			bDao.insertBoard(bVo);
+			
+			response.sendRedirect(url);
+		}
+	}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dto.MemberVO;
+
+public class Board3WriteFormAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/goods.jsp?command=view_application";
+			
+			HttpSession session = request.getSession();
+			MemberVO user = (MemberVO)session.getAttribute("loginUser");
+			if(user==null) {
+				url = "jsp/login.jsp?form=login&alarm=need";
+			}
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.Board4DAO;
+import com.scuba.dto.Board4VO;
+
+public class Board4ListAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/community.jsp?command=view_list";
+			Board4DAO bDao = Board4DAO.getInstance();
+			
+			List<Board4VO> boardList = bDao.selectAllBoards();
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("boardList4", boardList);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.Board4DAO;
+import com.scuba.dto.Board4VO;
+
+public class Board4WriteAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/community.jsp";
+			
+			request.setCharacterEncoding("utf-8");
+			
+			if(request.getAttribute("upload")==null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/upload3.do");
+				dispatcher.forward(request, response);
+			}
+			else {
+				
+				Board4VO bVo = new Board4VO();
+			
+				bVo.setUserid((String)request.getAttribute("userid"));
+				bVo.setName((String)request.getAttribute("name"));
+				bVo.setPass((String)request.getAttribute("pass"));
+				bVo.setTitle((String)request.getAttribute("title"));
+			if((String)request.getAttribute("pictureurl1")==null) {
+				bVo.setPictureurl1("no-image");
+			}
+			else {
+				bVo.setPictureurl1((String)request.getAttribute("pictureurl1"));
+			}
+			if((String)request.getAttribute("pictureurl2")==null) {
+				bVo.setPictureurl2("no-image");
+			}
+			else {
+				bVo.setPictureurl2((String)request.getAttribute("pictureurl2"));
+			}
+			bVo.setContent((String)request.getAttribute("content"));
+			
+			System.out.println(bVo);
+			Board4DAO bDao = Board4DAO.getInstance();
+			bDao.insertBoard(bVo);
+			
+			response.sendRedirect(url);
+		}
+	}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dto.MemberVO;
+
+public class Board4WriteFormAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/community.jsp?command=view_application";
+			
+			HttpSession session = request.getSession();
+			MemberVO user = (MemberVO)session.getAttribute("loginUser");
+			
+			if(user==null) {
+				url = "jsp/login.jsp?form=login&alarm=need";
+			}
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.scuba.dao.BulletinDAO;
+import com.scuba.dto.BulletinVO;
+
+public class BulletinListAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/community.jsp?command=view_bulletin";
+
+			BulletinDAO bDao = BulletinDAO.getInstance();
+			
+			List<BulletinVO> bulletin = bDao.selectAllBoards();
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("bulletin", bulletin);
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.scuba.dao.BulletinDAO;
+import com.scuba.dto.BulletinVO;
+
+public class BulletinWriteAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "BoardServlet?command=bulletin_list";
+			
+			request.setCharacterEncoding("utf-8");
+			
+			if(request.getAttribute("upload")==null) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/bulletin.do");
+				dispatcher.forward(request, response);
+			}
+			else {
+				BulletinVO bVo = new BulletinVO();
+				if((String)request.getAttribute("pictureurl")==null) {
+					bVo.setPictureurl("no-image");
+				}
+				else {
+					bVo.setPictureurl((String)request.getAttribute("pictureurl"));
+				}
+			
+				BulletinDAO bDao = BulletinDAO.getInstance();
+				bDao.insertBoard(bVo);
+			
+				response.sendRedirect(url);
+			}
+	}
+}
+package com.scuba.controller.action;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+public class LogoutAction implements Action{
+	@Override
+	public void execute(HttpServletRequest request,HttpServletResponse response) 
+		throws ServletException, IOException{
+			String url = "jsp/index.jsp";
+			
+			HttpSession session = request.getSession();
+			session.removeAttribute("loginUser");
+			
+			response.sendRedirect(url);
+		}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.scuba.dto.Board1VO;
+
+import util.DBManager;
+
+public class Board1DAO {
+	private Board1DAO() {
+		
+	}
+	
+	private static Board1DAO instance = new Board1DAO();
+	
+	public static Board1DAO getInstance() {
+		return instance;
+	}
+	
+	public List<Board1VO> selectAllBoards(){
+		String sql = "select * from board1 where rownum<=10 order by num desc";
+		
+		List<Board1VO> list = new ArrayList<Board1VO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				Board1VO bVo = new Board1VO();
+				
+				bVo.setNum(rs.getInt("num"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPhone(rs.getString("phone"));
+				bVo.setSpace(rs.getInt("space"));
+				bVo.setSubject(rs.getInt("subject"));
+				bVo.setPack(rs.getInt("pack"));
+				bVo.setTime(rs.getInt("time"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setWritedate(rs.getDate("writedate"));
+				
+				list.add(bVo);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, stmt, rs);
+		}
+		return list;
+	}
+	
+	public void insertBoard(Board1VO bVo) {
+		String sql = "insert into board1"
+				+ "(num,title,pass,name,phone,space,subject,pack,time,readcount) "
+				+ "values(board1_seq.nextval,?,?,?,?,?,?,?,?,?)";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,bVo.getTitle());
+			pstmt.setString(2,bVo.getPass());
+			pstmt.setString(3,bVo.getName());
+			pstmt.setString(4,bVo.getPhone());
+			pstmt.setInt(5,bVo.getSpace());
+			pstmt.setInt(6,bVo.getSubject());
+			pstmt.setInt(7,bVo.getPack());
+			pstmt.setInt(8,bVo.getTime());
+			pstmt.setInt(9,bVo.getReadcount());
+			//pstmt.setDate(10, bVo.getWritedate());
+			
+			pstmt.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, pstmt);
+		}
+	}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.scuba.dto.Board1VO;
+import com.scuba.dto.Board2VO;
+
+import util.DBManager;
+
+public class Board2DAO {
+	private Board2DAO() {
+		
+	}
+	
+	private static Board2DAO instance = new Board2DAO();
+	
+	public static Board2DAO getInstance() {
+		return instance;
+	}
+	
+	public List<Board2VO> selectAllBoards(){
+		String sql = "select * from (select * from board2 order by num desc) where rownum<=10";
+		
+		List<Board2VO> list = new ArrayList<Board2VO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				Board2VO bVo = new Board2VO();
+				
+				bVo.setNum(rs.getInt("num"));
+				bVo.setUserid(rs.getString("userid"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setPictureurl1(rs.getString("pictureurl1"));
+				bVo.setPictureurl2(rs.getString("pictureurl2"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setWritedate(rs.getDate("writedate"));
+				bVo.setContent(rs.getString("content"));
+				
+				list.add(bVo);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, stmt, rs);
+		}
+		return list;
+	}
+	
+	public void insertBoard(Board2VO bVo) {
+		String sql = "insert into board2"
+				+ "(num,userid,name,pass,title,pictureurl1,pictureurl2,readcount,content) "
+				+ "values(board2_seq.nextval,?,?,?,?,?,?,?,?)";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,bVo.getUserid());
+			pstmt.setString(2,bVo.getName());
+			pstmt.setString(3,bVo.getPass());
+			pstmt.setString(4,bVo.getTitle());
+			pstmt.setString(5,bVo.getPictureurl1());
+			pstmt.setString(6,bVo.getPictureurl2());
+			pstmt.setInt(7,bVo.getReadcount());
+			pstmt.setString(8,bVo.getContent());
+
+			pstmt.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, pstmt);
+		}
+	}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.scuba.dto.Board3VO;
+
+import util.DBManager;
+
+public class Board3DAO {
+	private Board3DAO() {
+		
+	}
+	
+	private static Board3DAO instance = new Board3DAO();
+	
+	public static Board3DAO getInstance() {
+		return instance;
+	}
+	
+	public List<Board3VO> selectAllBoards() {
+		String sql = "select * from board3 order by num desc";
+	
+		List<Board3VO> list = new ArrayList<Board3VO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DBManager.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				Board3VO bVo = new Board3VO();
+				
+				bVo.setNum(rs.getInt("num"));
+				bVo.setUserid(rs.getString("userid"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setPictureurl1(rs.getString("pictureurl1"));
+				bVo.setPictureurl2(rs.getString("pictureurl2"));
+				bVo.setWritedate(rs.getDate("writedate"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setContent(rs.getString("content"));
+				
+				list.add(bVo);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, stmt, rs);
+		}
+		return list;
+	}
+	public void insertBoard(Board3VO bVo) {
+		String sql = "insert into board3"
+				+ "(num,userid,name,pass,title,pictureurl1,pictureurl2,readcount,content) "
+				+ "values(board3_seq.nextval,?,?,?,?,?,?,?,?)";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,bVo.getUserid());
+			pstmt.setString(2,bVo.getName());
+			pstmt.setString(3,bVo.getPass());
+			pstmt.setString(4,bVo.getTitle());
+			pstmt.setString(5,bVo.getPictureurl1());
+			pstmt.setString(6,bVo.getPictureurl2());
+			pstmt.setInt(7,bVo.getReadcount());
+			pstmt.setString(8,bVo.getContent());
+
+			pstmt.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, pstmt);
+		}
+	}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.scuba.dto.Board3VO;
+import com.scuba.dto.Board4VO;
+
+import util.DBManager;
+
+public class Board4DAO {
+	private Board4DAO() {
+		
+	}
+	
+	private static Board4DAO instance = new Board4DAO();
+	
+	public static Board4DAO getInstance() {
+		return instance;
+	}
+	
+	public List<Board4VO> selectAllBoards() {
+		String sql = "select * from (select * from board4 order by num desc) where rownum<=10";
+	
+		List<Board4VO> list = new ArrayList<Board4VO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DBManager.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				Board4VO bVo = new Board4VO();
+				
+				bVo.setNum(rs.getInt("num"));
+				bVo.setUserid(rs.getString("userid"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setPictureurl1(rs.getString("pictureurl1"));
+				bVo.setPictureurl2(rs.getString("pictureurl2"));
+				bVo.setWritedate(rs.getDate("writedate"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setContent(rs.getString("content"));
+				
+				list.add(bVo);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, stmt, rs);
+		}
+		return list;
+	}
+	public void insertBoard(Board4VO bVo) {
+		String sql = "insert into board4"
+				+ "(num,userid,name,pass,title,pictureurl1,pictureurl2,readcount,content) "
+				+ "values(board4_seq.nextval,?,?,?,?,?,?,?,?)";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,bVo.getUserid());
+			pstmt.setString(2,bVo.getName());
+			pstmt.setString(3,bVo.getPass());
+			pstmt.setString(4,bVo.getTitle());
+			pstmt.setString(5,bVo.getPictureurl1());
+			pstmt.setString(6,bVo.getPictureurl2());
+			pstmt.setInt(7,bVo.getReadcount());
+			pstmt.setString(8,bVo.getContent());
+
+			pstmt.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, pstmt);
+		}
+	}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.scuba.dto.Board3VO;
+import com.scuba.dto.Board4VO;
+
+import util.DBManager;
+
+public class Board4DAO {
+	private Board4DAO() {
+		
+	}
+	
+	private static Board4DAO instance = new Board4DAO();
+	
+	public static Board4DAO getInstance() {
+		return instance;
+	}
+	
+	public List<Board4VO> selectAllBoards() {
+		String sql = "select * from (select * from board4 order by num desc) where rownum<=10";
+	
+		List<Board4VO> list = new ArrayList<Board4VO>();
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = DBManager.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			while(rs.next()) {
+				Board4VO bVo = new Board4VO();
+				
+				bVo.setNum(rs.getInt("num"));
+				bVo.setUserid(rs.getString("userid"));
+				bVo.setName(rs.getString("name"));
+				bVo.setPass(rs.getString("pass"));
+				bVo.setTitle(rs.getString("title"));
+				bVo.setPictureurl1(rs.getString("pictureurl1"));
+				bVo.setPictureurl2(rs.getString("pictureurl2"));
+				bVo.setWritedate(rs.getDate("writedate"));
+				bVo.setReadcount(rs.getInt("readcount"));
+				bVo.setContent(rs.getString("content"));
+				
+				list.add(bVo);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, stmt, rs);
+		}
+		return list;
+	}
+	public void insertBoard(Board4VO bVo) {
+		String sql = "insert into board4"
+				+ "(num,userid,name,pass,title,pictureurl1,pictureurl2,readcount,content) "
+				+ "values(board4_seq.nextval,?,?,?,?,?,?,?,?)";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,bVo.getUserid());
+			pstmt.setString(2,bVo.getName());
+			pstmt.setString(3,bVo.getPass());
+			pstmt.setString(4,bVo.getTitle());
+			pstmt.setString(5,bVo.getPictureurl1());
+			pstmt.setString(6,bVo.getPictureurl2());
+			pstmt.setInt(7,bVo.getReadcount());
+			pstmt.setString(8,bVo.getContent());
+
+			pstmt.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn, pstmt);
+		}
+	}
+}
+package com.scuba.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import com.scuba.dto.MemberVO;
+
+import util.DBManager;
+
+public class MemberDAO {
+	private MemberDAO() {}
+	private static MemberDAO instance = new MemberDAO();
+	public static MemberDAO getInstance() {
+		return instance;
+	}
+	public int userCheck(String userid, String pwd) {
+		int result = -1;
+		String sql = "select pwd from member where userid=?";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				if(rs.getString("pwd")!=null&&rs.getString("pwd").equals(pwd)) {
+					result = 1;
+				}
+				else {
+					result = 0;
+				}
+			}
+			else {
+				result = -1;
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn,pstmt,rs);
+		}
+		return result;
+	}
+	
+	public MemberVO selectByUserid(String userid) {
+		String sql = "select * from member where userid=?";
+		MemberVO mVo = null;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, userid);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				mVo = new MemberVO();
+				mVo.setNum(rs.getInt("num"));
+				mVo.setUserid(rs.getString("userid"));
+				mVo.setPwd(rs.getString("pwd"));
+				mVo.setName(rs.getString("name"));
+				mVo.setSex(rs.getInt("sex"));
+				mVo.setTel(rs.getString("tel"));
+				mVo.setPhone(rs.getString("phone"));
+				mVo.setEmail(rs.getString("email"));
+				mVo.setAddress(rs.getString("address"));
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn,pstmt,rs);
+		}
+		return mVo;
+	}
+	
+	public int insertMember(MemberVO mVo) {
+		int result = -1;
+		String sql = "insert into member(num,userid,pwd,name,sex,tel,phone,email,address)"
+				+ " values(member_seq.nextval,?,?,?,?,?,?,?,?)";
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = DBManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, mVo.getUserid());
+			pstmt.setString(2,mVo.getPwd());
+			pstmt.setString(3, mVo.getName());
+			pstmt.setInt(4, mVo.getSex());
+			pstmt.setString(5, mVo.getTel());
+			pstmt.setString(6, mVo.getPhone());
+			pstmt.setString(7, mVo.getEmail());
+			pstmt.setString(8, mVo.getAddress());
+		
+			pstmt.executeUpdate();
+		
+			result = 1;
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			DBManager.close(conn,pstmt);
+		}
+		return result;
+	}
+}
+package com.scuba.dto;
+
+import java.sql.Date;
+
+public class Board1VO {
+	private int num;
+	private String title;
+	private String pass;
+	private String name;
+	private String phone;
+	private int space;
+	private int subject;
+	private int pack;
+	private int time;
+	private int readcount;
+	private Date writedate;
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public int getSpace() {
+		return space;
+	}
+	public void setSpace(int space) {
+		this.space = space;
+	}
+	public int getSubject() {
+		return subject;
+	}
+	public void setSubject(int subject) {
+		this.subject = subject;
+	}
+	public int getPack() {
+		return pack;
+	}
+	public void setPack(int pack) {
+		this.pack = pack;
+	}
+	public int getTime() {
+		return time;
+	}
+	public void setTime(int time) {
+		this.time = time;
+	}
+	public int getReadcount() {
+		return readcount;
+	}
+	public void setReadcount(int readcount) {
+		this.readcount = readcount;
+	}
+	public Date getWritedate() {
+		return writedate;
+	}
+	public void setWritedate(Date writedate) {
+		this.writedate = writedate;
+	}
+	@Override
+	public String toString() {
+		return "Board1VO [num=" + num + ", title=" + title + ", pass=" + pass + ", name=" + name + ", phone=" + phone
+				+ ", space=" + space + ", subject=" + subject + ", pack=" + pack + ", time=" + time + ", readcount="
+				+ readcount + ", writedate=" + writedate + "]";
+	}
+	
+	
+	
+}
+package com.scuba.dto;
+
+import java.sql.Date;
+
+public class Board2VO {
+	private int num;
+	private String userid;
+	private String name;
+	private String pass;
+	private String title;
+	private String pictureurl1;
+	private String pictureurl2;
+	private int readcount;
+	private Date writedate;
+	private String content;
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getPictureurl1() {
+		return pictureurl1;
+	}
+	public void setPictureurl1(String pictureurl1) {
+		this.pictureurl1 = pictureurl1;
+	}
+	public String getPictureurl2() {
+		return pictureurl2;
+	}
+	public void setPictureurl2(String pictureurl2) {
+		this.pictureurl2 = pictureurl2;
+	}
+	public int getReadcount() {
+		return readcount;
+	}
+	public void setReadcount(int readcount) {
+		this.readcount = readcount;
+	}
+	public Date getWritedate() {
+		return writedate;
+	}
+	public void setWritedate(Date writedate) {
+		this.writedate = writedate;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	@Override
+	public String toString() {
+		return "Board2VO [num=" + num + ", userid=" + userid + ", name=" + name + ", pass=" + pass + ", title=" + title
+				+ ", pictureurl1=" + pictureurl1 + "pictureurl2=" + pictureurl2 + ", readcount=" + readcount + ", writedate=" + writedate + ", content="
+				+ content + "]";
+	}
+	
+}
+package com.scuba.dto;
+
+import java.sql.Date;
+
+public class Board3VO {
+	private int num;
+	private String userid;
+	private String name;
+	private String pass;
+	private String title;
+	private String pictureurl1;
+	private String pictureurl2;
+	private Date writedate;
+	private int readcount;
+	private String content;
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getPictureurl1() {
+		return pictureurl1;
+	}
+	public void setPictureurl1(String pictureurl1) {
+		this.pictureurl1 = pictureurl1;
+	}
+	public String getPictureurl2() {
+		return pictureurl2;
+	}
+	public void setPictureurl2(String pictureurl2) {
+		this.pictureurl2 = pictureurl2;
+	}
+	public Date getWritedate() {
+		return writedate;
+	}
+	public void setWritedate(Date writedate) {
+		this.writedate = writedate;
+	}
+	public int getReadcount() {
+		return readcount;
+	}
+	public void setReadcount(int readcount) {
+		this.readcount = readcount;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	@Override
+	public String toString() {
+		return "Board3VO [num=" + num + ", userid=" + userid + ", name=" + name + ", pass=" + pass + ", title=" + title
+				+ ", pictureurl1=" + pictureurl1 + ", pictureurl2=" + pictureurl2 + ", writedate=" + writedate
+				+ ", readcount=" + readcount + ", content=" + content + "]";
+	}
+
+}
+package com.scuba.dto;
+
+import java.sql.Date;
+
+public class Board4VO {
+	private int num;
+	private String userid;
+	private String name;
+	private String pass;
+	private String title;
+	private String pictureurl1;
+	private String pictureurl2;
+	private int readcount;
+	private Date writedate;
+	private String content;
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getPictureurl1() {
+		return pictureurl1;
+	}
+	public void setPictureurl1(String pictureurl1) {
+		this.pictureurl1 = pictureurl1;
+	}
+	public String getPictureurl2() {
+		return pictureurl2;
+	}
+	public void setPictureurl2(String pictureurl2) {
+		this.pictureurl2 = pictureurl2;
+	}
+	public int getReadcount() {
+		return readcount;
+	}
+	public void setReadcount(int readcount) {
+		this.readcount = readcount;
+	}
+	public Date getWritedate() {
+		return writedate;
+	}
+	public void setWritedate(Date writedate) {
+		this.writedate = writedate;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+	@Override
+	public String toString() {
+		return "Board4VO [num=" + num + ", userid=" + userid + ", name=" + name + ", pass=" + pass + ", title=" + title
+				+ ", pictureurl1=" + pictureurl1 + ", pictureurl2=" + pictureurl2 + ", readcount=" + readcount
+				+ ", writedate=" + writedate + ", content=" + content + "]";
+	}
+	
+}
+package com.scuba.dto;
+
+public class BulletinVO {
+	private int num;
+	private String pictureurl;
+	public int getNum() {
+		return num;
+	}
+	public void setNum(int num) {
+		this.num = num;
+	}
+	public String getPictureurl() {
+		return pictureurl;
+	}
+	public void setPictureurl(String pictureurl) {
+		this.pictureurl = pictureurl;
+	}
+	@Override
+	public String toString() {
+		return "BulletinVO [num=" + num + ", pictureurl=" + pictureurl + "]";
+	}
+}
+package com.scuba.dto;
+
+public class MemberVO {
+private int num;
+private String userid;
+private String pwd;
+private String name;
+private Integer sex;
+private String tel;
+private String phone;
+private String email;
+private String address;
+public int getNum() {
+	return num;
+}
+public void setNum(int num) {
+	this.num = num;
+}
+public String getUserid() {
+	return userid;
+}
+public void setUserid(String userid) {
+	this.userid = userid;
+}
+public String getPwd() {
+	return pwd;
+}
+public void setPwd(String pwd) {
+	this.pwd = pwd;
+}
+public String getName() {
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+public int getSex() {
+	return sex;
+}
+public void setSex(int sex) {
+	this.sex = sex;
+}
+public String getTel() {
+	return tel;
+}
+public void setTel(String tel) {
+	this.tel = tel;
+}
+public String getPhone() {
+	return phone;
+}
+public void setPhone(String phone) {
+	this.phone = phone;
+}
+public String getEmail() {
+	return email;
+}
+public void setEmail(String email) {
+	this.email = email;
+}
+public String getAddress() {
+	return address;
+}
+public void setAddress(String address) {
+	this.address = address;
+}
+@Override
+public String toString() {
+	return "MemberVO [num=" + num + ", userid=" + userid + ", pwd=" + pwd + ", name=" + name + ", sex=" + sex + ", tel="
+			+ tel + ", phone=" + phone + ", email=" + email + ", address=" + address + "]";
+}
+
+}
+package util;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+public class DBManager {
+
+	public static Connection getConnection() {
+	Connection conn = null;
+	try {
+		Context initContext = new InitialContext();
+		Context envContext = (Context) initContext.lookup("java:/comp/env");
+		DataSource ds = (DataSource) envContext.lookup("jdbc/myoracle");
+		conn = ds.getConnection();
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
+	return conn;
+}
+
+	public static void close(Connection conn, Statement stmt, ResultSet rs) {
+		try {
+			rs.close();
+			stmt.close();
+			conn.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void close(Connection conn, Statement stmt) {
+		try {
+			stmt.close();
+			conn.close();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+@charset "UTF-8";
+body {margin:0; padding:0;font-size:0.75em;font-family:dotum}
+html, h1, h2, h3, h4, h5, h6, form, fieldset, img {margin:0;padding:0;border:0}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block}
+
+#hd ul, nav ul, #ft ul {margin:0;padding:0;list-style:none}
+legend {position:absolute;margin:0;padding:0;font-size:0;line-height:0;text-indent:-9999em;overflow:hidden}
+label, input, button, select, img {vertical-align:middle}
+input, button {margin:0;padding:0;font-family:dotum;font-size:1em}
+button {cursor:pointer}
+
+textarea, select {font-family:dotum;font-size:1em}
+select {margin:0}
+p  {margin:0;padding:0;word-break:break-all}
+hr {display:none}
+pre {overflow-x:scroll;font-size:1.1em}
+a:link, a:visited {color:#000;text-decoration:none}
+a:hover, a:focus, a:active {color:#000;text-decoration:underline}
+/*css reset*/
+html{
+	width:1663px;
+	height:2020px;
+}
+body{
+	width:1663px;
+	height:2020px;
+}
+
+
+/* header */
+header{
+	height:300px;
+	position: relative;
+}
+#login {
+	position: relative;
+	background-color: #2BA5BA;
+	height: 40px;
+}
+#login > ul{
+	position:absolute;
+	width:95%;
+	list-style: none;
+	height:30px;
+}
+#login > ul li{
+	float:right;
+	margin-left:20px;
+}
+
+#logo {
+	position: relative;
+	height: 190px;
+	background-color: white;
+}
+
+#logo> div:nth-child(1)  {
+	position: relative;
+	height: 125px;
+}
+
+#logo> div:nth-child(2){
+	position: relative;
+	height: 65px;
+}
+
+#nav {
+	position: relative;
+	height: 70px;
+	background-color: #2BA5BA;
+}
+
+#nav ul {
+	position:absolute;
+	list-style: none;
+	padding:15px 100px 5px 150px;
+	margin:25px 100px 10px 400px;
+
+}
+
+#nav ul li {
+	float:left;
+	margin:0px 30px 0px 30px;
+}
+/* header */
+
+
+/* footer */
+footer{
+position:absolute;
+margin-top:155px;
+padding-left:100px;
+}
+/* footer */
+@charset "UTF-8";
+
+/* fake footer */
+section{
+	background-image:url('../images/background.gif');
+	background-size: contain;
+	/*width: 1668px;
+	height: 2020px;*/
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+#footer{
+	background-color:#2BA5BA;
+	font-weight: bolder;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+	height:200px;
+	margin-top:100px;
+}
+
+#footer h3{
+	font-size:28px;
+}
+#footer ul{
+	list-style: none;
+	margin-top:70px;
+}
+#footer ul li{
+	float:left;
+    margin-left:200px;
+    margin-right:100px;
+}
+/* fake footer */
+@charset "UTF-8";
+#community{
+	position:relative;
+	width:1663px;
+	height:1500px;
+}
+#community_nav{
+	margin-top:100px;
+}
+#community_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#community_nav>ul li{
+	margin-left:50px;
+}
+#community_nav>ul li button{
+	height:30px;
+	width:150px;
+	Opacity:0.8;
+	border:none;
+}
+#community_content{
+	width:1663px;
+	height:835.2px;
+	margin-top:30px;
+}
+#community_list{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	/*visibility:hidden;*/
+}
+#community_list>h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_list>p{
+	text-align: center;
+}
+#community_list>form{
+	margin-top:70px;
+	width:1601px;
+	
+}
+#community_list>form figure{
+	width:1500px;
+	margin-left:100px;
+}
+#community_list>form figure h3{
+	text-align:left;
+}
+#community_list>form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:40px;
+}
+#community_list>form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#community_list>form table thead{
+	background-color:#4695ed;
+	font-size:20px;
+}
+#community_list>form table thead th{
+	height:40px;
+}
+#community_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#community_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#community_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#community_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#community_list > form table tbody td{
+	text-align:center;
+}
+#community_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#community_application{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_application h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_application p{
+	text-align: center;
+}
+#community_application form{
+	margin-top:50px;
+	margin-left:60px;
+	width:1530px;
+	height:600px;
+}
+#community_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#community_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#community_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize : none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+#community_detail{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_detail > h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_detail > p{
+	text-align: center;
+}
+#community_board{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_board > h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_board > p{
+	text-align: center;
+}
+#community_board > table{
+	width:1300px;
+	height:600px;
+	margin:0 auto;
+	margin-top:50px;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+#community_board >table tr{
+	height:300px;
+}
+#community_board > table td{
+	border:50px solid black;
+	padding:0px 0px 0px 0px;
+}
+#community_board > input{
+	margin-left:755px;
+	width:150px;
+	height:35px;
+	margin-top:40px;
+}
+#community_upload{
+	position: absolute;
+	width:1663px;
+	height:776px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_upload h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_upload p{
+	text-align: center;
+}
+#community_upload form{
+	margin-top:100px;
+	width:1663px;
+	height:550px;
+}
+#community_upload div{
+	position: relative;
+    width: 1663px;
+    height: 550px;
+    overflow: hidden;
+}
+#community_upload input:nth-child(1){
+	opacity: 0;
+    filter: alpha(opacity=0);
+    -ms-filter: "alpha(opacity=0)";
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+}
+#community_upload input:nth-child(2){
+	margin-left:755px;
+	width:150px;
+	height:35px;
+	margin-top:40px;
+}
+@charset "UTF-8";
+#edu{
+	position:relative;
+	height:1500px;
+}
+#edu_nav{
+	margin-top:100px;
+}
+
+#edu_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#edu_nav>ul li{
+	margin-left:50px;
+}
+#edu_nav>ul li button{
+	height:30px;
+	width:150px;
+	border:none;
+	Opacity:0.8;
+}
+#edu_content{
+	height:835.2px;
+	width:1663px;
+}
+#edu_curriculum{
+	position: absolute;
+	width:1663px;
+	/*visibility:hidden;*/
+}
+#edu_curriculum > h1{
+	text-align:center;
+}
+
+#edu_curriculum > ul{
+	width:1600px;
+	margin-top:70px;
+	display:flex;
+	flex-direction:row;
+	align-content:flex-start; 
+	flex-wrap:wrap; 
+	overflow:auto;
+    list-style: none;
+
+}
+#edu_curriculum > ul li{
+	margin-left:70px;
+	background-color:#dcdcdc;
+	Opacity:0.8;
+}
+#edu_curriculum > ul li:nth-child(1){
+	margin-left:350px;
+}
+#edu_curriculum > ul li:nth-child(4){
+	margin-top:30px;
+	margin-left:520px;
+}
+#edu_curriculum > ul li:nth-child(5){
+	margin-top:30px;
+}
+#edu_curriculum > ul li h2,h3{
+	text-align:center;
+}
+.course{
+	text-align:center;
+}
+
+#edu_list{
+	width:1663px;
+	position:absolute;
+	margin-top:50px;
+	visibility: hidden;
+}
+#edu_list > h1{
+	width:1663px;
+	text-align: center;
+}
+#edu_list > form{
+	margin-left:30px;
+	width:1530px;
+	height:600px;
+}
+#edu_list > form figure{
+	width:1500px;
+	margin-right:0;
+}
+#edu_list > form h3{
+	text-align:left;
+}
+#edu_list > form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:34px;
+}
+#edu_list > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#edu_list > form table thead{
+	height:25px;
+	background-color:#4695ed;
+	font-size:20px;
+}
+#edu_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#edu_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#edu_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#edu_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#edu_list > form table tbody{
+	
+} 
+#edu_list > form table tbody td{
+	text-align:center;
+}
+
+#edu_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#edu_application {
+	position:absolute;
+	margin-top:50px;
+	width:1663px;
+	visibility: hidden;
+}
+#edu_application h1{
+	width:1663px;
+	text-align: center;
+}
+#edu_application > form {
+	margin-left:60px;
+	width:90%;
+	height:600px;
+}
+#edu_application > form h3{
+	text-align: left;
+}
+#edu_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#edu_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#edu_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+}@charset "UTF-8";
+#goods{
+	position:relative;
+	height:1500px;
+}
+#goods_nav{
+	margin-top:100px;
+}
+#goods_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#goods_nav>ul li{
+	margin-left:50px;
+}
+#goods_nav>ul li button{
+	height:30px;
+	width:150px;
+	Opacity:0.8;
+	border:none;
+	
+}
+#goods_content{
+	height:835.2px;
+	margin-top:30px;
+}
+#goods_content > h1{
+	text-align:center;
+	font-size:40px;
+
+}
+#goods_content > p{
+	text-align:center;
+	letter-spacing: 0.3em;
+	font-size:20px;
+	font-weight: bolder;
+}
+#goods_list{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	/*visibility:hidden;*/
+}
+#goods_list > form{
+	width:1300px;
+	justify-content: center;
+	margin-left:180px;
+}
+#goods_list > form table{
+	margin:0 auto;
+	text-align: center;
+}
+#goods_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+	margin-top:20px;
+}
+#goods_application{
+	position:absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#goods_application form{
+	width:1530px;
+	height:600px;
+	margin-left:60px;
+}
+#goods_application form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#goods_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#goods_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize:none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+#goods_detail{
+	position:absolute;
+	width:1663px;
+	/*visibility:hidden;*/
+}
+#goods_etc{
+	position:absolute;
+	width:1663px;
+	visibility:hidden;
+}
+#goods_etc > ul{
+	margin-top:70px;
+	width:1500px;
+	display:flex;
+	flex-direction:row;
+	list-style: none;
+	
+}
+#goods_etc > ul li{
+	margin-left:170px;
+	background-color:#dcdcdc;
+	font-size:15px;
+	Opacity:0.8;
+}
+#goods_etc > ul li h2{
+	font-size:30px;
+}
+#goods_etc > ul li h3{
+	font-size:25px;
+}@charset "UTF-8";
+
+#index{
+	height:1500px;
+}
+#picture{
+	position:relative;
+	height:900px;
+}
+#picture>div{
+	position:absolute;
+	height:400px;
+}
+
+#picture> div img{
+	display:block;
+}
+
+#picture>div div:nth-child(2) img{
+	height:0px;
+}
+
+#picture>div div:nth-child(3) img{
+	height:0px;
+}
+
+.bullet{
+	position:absolute;
+	list-style: none;
+	margin-top:45%;
+	margin-left: 43%;
+	width:100px;
+	
+}
+.bullet>li{
+	float:left;
+	background-color:white;
+	width:8px;
+	height:8px;
+	margin-left:20px;
+	border-radius:50%;
+	transition: 1s;
+	
+}
+.bullet>li:nth-child(1):hover{
+	background-color:blue;
+}
+.bullet>li:nth-child(2):hover{
+	background-color:blue;
+}
+.bullet>li:nth-child(3):hover{
+	background-color:blue;
+}
+#product{
+	margin-top:50px;
+}
+#product>ul{
+	display:flex; 
+	flex-direction:row;
+	justify-content:center;
+}
+#product>ul li{
+	margin:0px 60px 0px 50px;
+	list-style: none;
+}
+/* 스톤 수정(2020.07.20_권재우) */
+#stone{
+	margin-top:130px;
+	margin-bottom:190px;
+	margin-left:195px;
+	padding-top:50px;
+}
+#stone>div{
+  padding:10; margin:10;
+  background-color:#bebebe;
+  border-radius: 25%;
+  padding:60px 40px 60px 40px;
+  display:inline;
+  Opacity:0.8;
+}
+#stone>div:nth-child(1){
+	font-size:15px;
+}
+#stone>div:nth-child(2){
+	margin-left:120px;
+	padding:60px 30px 60px 30px;
+	font-size:15px;
+}
+#stone>div:nth-child(3){
+	margin-left:120px;
+	font-size:15px;
+}
+#stone>div:nth-child(4){
+	margin-left:120px;
+	padding:60px 55px 60px 55px;
+	font-size:15px;
+}
+#stone>div:nth-child(5){
+	margin-left:120px;
+	padding:60px 55px 60px 55px;
+	font-size:15px;
+}
+@charset "UTF-8";
+
+/*여기서 부턴 인트로*/
+#intro{
+	position:relative;
+	height:1500px;
+}
+#intro_nav{
+	margin-top:100px;
+}
+#intro_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#intro_nav>ul li{
+	margin-left:50px;
+}
+#intro_nav>ul li button{
+	height:30px;
+	width:150px;
+	Opacity:0.8;
+	border:none;
+}
+#intro_content{
+	height:835.2px;
+	margin-top:30px;
+}
+#greeting{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	text-align:center;
+	height:835.2px;
+	font-size:30px;
+}
+
+#teacher{
+	position:absolute;
+	height:835.2px;
+	margin-left:350px;
+	visibility:hidden;
+}
+#teacher > table{
+	font-size:20px;
+}
+.greeting{
+	resize : none;
+	border:solid 0; 
+	background-color:transparent;
+}@charset "UTF-8";
+
+/* login.css */
+#form{
+	position: relative;
+	height:1500px;
+}
+#form_content{
+	height:835.2px;
+	margin-top:140px;
+}
+#login_form{
+	position: absolute;
+	width:100%;
+	margin-top:320px;
+}
+#login_form>h3{
+	font-size:40px;
+	margin-bottom: 30px;
+}
+#login_form>form table{
+	height:100px;
+	width:350px;
+}
+#login_form>form table th{
+	font-size:30px;
+}
+#login_form>form table td{
+	height:50px;
+}
+.button1{
+	margin-top:40px;
+	width:100px;
+	height:30px;
+	background-color:blue;
+	color:white;
+}
+.button2{
+	margin-top:40px;
+	margin-left:30px;
+	width:100px;
+	height:30px;
+}
+#join_form{
+	position: absolute;
+	width:100%;
+	margin-top:190px;
+	visibility:hidden;
+}
+
+#join_form>h3{
+	font-size:40px;
+	margin-bottom: 30px;
+}
+#join_form>form table{
+	height:350px;
+	width:500px;
+}
+#join_form>form table th{
+	font-size:20px;
+}@charset "UTF-8";
+#post{
+	position: relative;
+	height:1500px;
+}
+#post_content{
+	height:835.2px;
+	margin-top:140px;
+}
+#post_content > h1{
+	text-align: center;
+	margin-top:20px;
+	font-size:40px;
+}
+#post_list{
+	position:absolute;
+	/*visibility: hidden;*/
+	margin-top:50px;
+}
+#post_list > h1{
+	width:1701px;
+	text-align: center;
+}
+#post_list > form{
+	margin-left:30px;
+	width:1530px;
+	height:600px;
+}
+#post_list > form figure{
+	width:1500px;
+	margin-right:0;
+}
+#post_list > form h3{
+	text-align:left;
+}
+#post_list > form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:40px;
+}
+#post_list > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#post_list > form table thead{
+	background-color:#4695ed;
+	font-size:20px;
+	height:25px;
+}
+
+#post_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#post_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#post_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#post_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#post_list > form table tbody{
+	
+} 
+#post_list > form table tbody td{
+	text-align:center;
+}
+#post_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#post_application{
+	position:absolute;
+	visibility: hidden;
+	margin-top:50px;
+}
+#post_application form{
+	margin-left:60px;
+	width:1530px;
+	height:600px;
+}
+#post_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#post_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#post_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize : none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<link type="text/css" href="../css/community.css" rel="stylesheet">
+</head>
+<body>
+
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+<section id="community">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="community_nav">
+		<ul>
+			<li><button>공지사항</button></li>
+			<li><button>사진게시판</button></li>
+		</ul>
+	</div>
+	
+	<div id="community_content">
+	
+		<div id="community_list">
+			
+			<h1><b>공지사항</b></h1>
+			<p>-------------------</p>
+		
+		<form action="community.html" method="post">
+			<figure>
+				<figcaption>
+					<h3 style='color:#00bfff'><b>Total 1건 1페이지</b></h3>
+					<br>
+				</figcaption>
+			<table>
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>글쓴이</th>
+						<th>날짜</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</figure>
+		<br><br>
+		<input type="button" value="글쓰기">
+		</form>	
+	</div>
+	<div id="community_application">
+			<h1><b>공지사항</b></h1>
+			<p>-------------------</p>
+		<form action="community.html" method="post">
+			<table>
+				<tr>
+					<th>이름</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="이름을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>비밀번호</th>
+					<td>&nbsp;&nbsp;<input type="password" size="40" placeholder="비밀번호를 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>제목</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="제목을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>내용(최대 300자)</th>
+					<td>&nbsp;&nbsp;<textarea class="form-control" rows="20" name="bo_content" id="bo_content">${smarteditorVO.bo_content}</textarea></td>
+				</tr>
+				<tr>
+					<th>첨부파일1</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>
+				<tr>
+					<th>첨부파일2</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>				
+			</table>
+			<input class="button1" type="submit" value="작성">
+			<input class="button2" type="reset" value="취소">
+		</form>
+	</div>	
+
+	<div id="community_detail">
+		<h1><b>공지사항</b></h1>
+		<p>-----------------</p>
+	</div>
+	
+	<div id="community_board">
+		<h1><b>사진 게시판</b></h1>
+		<br>
+		<p>-----------------------</p>
+		<table border="10">
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>			
+		</table>
+		<input type="button" value="사진 올리기">
+	</div>
+	
+	<div id="community_upload">
+	
+		<h1><b>사진 게시판</b></h1>
+		<br>
+		<p>----------------------</p>	
+	
+	
+		<form>
+			<input type="file" >
+		</form>
+	
+	
+	</div>
+	
+	
+</div>
+	
+	
+	
+
+	
+	
+	
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+	
+	
+	</section>
+
+
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/edu.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+</head>
+<body>
+
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>		
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+<section id="edu">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="edu_nav">
+		<ul>
+			<li><button>스쿠버다이빙 교육과정</button></li>
+			<li><button>스쿠버다이빙 교육신청</button></li>
+		</ul>
+	</div>
+	
+	<div id="edu_content">
+	<div id="edu_curriculum">
+	
+	<!-- 스쿠버 다이빙 교육과정 -->
+	<br><br>
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육과정</h1>
+		
+		<ul>
+		    <!-- 오픈워터 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>오픈워터 교육과정</b></h2>
+				<h3><b>700,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Openwater Driver Course</small></p>
+				<p class="course"><span>1박 2일 패키지 : 600,000원</span></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만 10세 이상</p>
+				<p><b>교육기간 : </b> 2박 3일 소요(권장)</p>
+				<p><b>준비물 : </b> 수영복, 개인도구, 선크림</p>
+				<p><b>최대수심 : </b> 18m</p>
+				<p><b>교육장소 : </b> 강원도 고성, 양양, 제주도, 해외</p>
+				<p><b>포함사항 : </b> 교재 및 라이센스 발급, 장비대여,</p>
+				<p>보트이용, 이론수업, 수영장교육, 개방수역(4회),</p>
+				<p> 중식(2회), 숙박, 수중기념사진, 로그북 증정</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 오픈워터 교육과정 -->
+			
+			<!-- 어드벤스드 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>어드벤스드 교육과정</b></h2>
+				<h3><b>600,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Advanced Openwater Driver Course</small></p>
+				<p class="course"><span>1박 2일 패키지 : 550,000원</span></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 오픈워터 다이버 자격증 소지자</p>
+				<p><b>교육기간 : </b> 1박 2일</p>
+				<p><b>준비물 : </b> 수영복, 개인도구, 선크림</p>
+				<p><b>최대수심 : </b> 35m</p>
+				<p><b>교육장소 : </b> 스페셜티 코스에 따른 다양한 </p>
+				<p>펀다이빙 포인트</p>
+				<p><b>포함사항 : </b> 교재 및 라이센스 발급, 장비대여,</p>
+				<p>보트이용, 이론수업, 개방수역(5회), 중식(1회), </p>
+				<p>숙박, 수중기념사진, 로그북 증정</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 어드벤스드 교육과정 -->
+			
+			<!-- 마스터 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>마스터 교육과정</b></h2>
+				<h3><b>별도 문의</b></h3>
+				<p class="course"><small>Drive Master Course</small></p>
+				<br><br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만19세 이상 / 레스큐 이상의 소지자</p>
+				<p><b>준비물 : </b> 50회 이상의 기록된 다이빙, </p>
+				<p>24개월 이내에 갱신된 응급처치 자격증, 수영복,</p>
+				<p>샤워용품</p>
+				<p><b>교육기간 : </b> 7일</p>
+				<p><b>장소 : </b> 스페셜티 코스에 따른 다양한 </p>
+				<p>펀다이빙 포인트</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 마스터 교육과정 -->
+			
+			<!-- 나이트록스 교육과정 -->
+			<li>
+				
+				<h2 style='color:#ff0a00'><b>나이트록스 교육과정</b></h2>
+				<h3><b>200,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Nitrox Driver Course</small></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 오픈워터 다이버 자격증 이상의 소지자</p>
+				<p><b>교육기간 : </b> 1일 소요</p>
+				<p><b>준비물 : </b> 계산기, 필기도구</p>
+				<p><b>교육장소 : </b> 서울/제주 교육센터</p>
+				<p><b>포함사항 : </b> 교재 및 라이센트 발급, 이론수업, </p>
+				<p>나이트롤스 해양실습(선택), 중식</p>
+				<br><br><br><br><br><br>
+			</li>
+			<!-- 나이트록스 교육과정 -->
+			
+			<!-- 레스큐 교육과정 -->
+			<li>
+
+				<h2 style='color:#ff0a00'><b>레스큐 교육과정</b></h2>
+				<h3><b>600,000원</b><small>(추가 비용X)</small></h3>
+				<p class="course"><small>Rescue Driver Course</small></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만 12세 이상 / 오픈워터 다이버 자격증 </p>
+				<p>이상의 소지자</p>
+				<p><b>교육기간 : </b> 1일 소요</p>
+				<p><b>준비물 : </b> 수영복, 개인세면도구, 선크림</p>
+				<p><b>교육장소 : </b> 이론교육, 수영장, 해양실습</p>
+				<p><b>포함사항 : </b> 교재 및 라이센트 발급, 이론수업, </p>
+				<p>장비대여, 제한수역교육, 개방수역교육(5회),</p> 
+				<p>중식</p>
+				<br><br><br><br><br><br>
+			</li>
+			<!-- 레스큐 교육과정 -->
+		</ul>
+		<!-- 스쿠버 다이빙 교육과정 -->
+	</div>
+		
+		<!-- 스쿠버 다이빙 교육신청 -->
+	<div id="edu_list">
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육신청</h1><br><br>
+		
+	<!-- 교육신청 현황 테이블 FORM -->		
+		
+		<form action="edu.html" method="post">
+			<figure>
+				<figcaption>
+					<h3 style='color:#00bfff'><b>스쿠버다이빙 세계에 오신걸 환영합니다!</b></h3>
+					<br>
+				</figcaption>
+			<table>
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>글쓴이</th>
+						<th>날짜</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</figure>
+		<br><br>
+		<input type="button" value="글쓰기">
+	</form>	
+	</div>
+	<!-- 교육신청 현황 테이블 FORM -->
+	
+	<!-- 교육신청 글쓰기 FORM -->
+	<div id="edu_application">
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육신청</h1><br><br>
+   	
+	<form action="" method="post">
+		<figure>
+			<figcaption> 
+				<h3 style='color:#00bfff'><b>스쿠버다이빙 세계에 오신걸 환영합니다!</b></h3><br>
+			</figcaption>
+		<table>
+
+			<tr>
+				<th>제목</th>
+				<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="내용을 입력해주세요" ></td>
+			</tr>
+			<tr>
+				<th>비밀번호</th>
+				<td>&nbsp;&nbsp;<input type="password" size="40" placeholder="내용을 입력해주세요" ></td>
+			</tr>			
+			<tr>
+				<th>이름</th>
+				<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="내용을 입력해주세요" ></td>
+			</tr>		
+			<tr>
+				<th>연락처</th>
+				<td>&nbsp;&nbsp;<input type="tel" size="40" placeholder="내용을 입력해주세요" ></td>
+			</tr>
+			<tr>
+				<th>교육지점</th>
+				<td>&nbsp;&nbsp;
+					<select style="width:130px">
+						<option selected disabled hidden>교육지점</option>
+						<option>서울</option>
+						<option>제주</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th>교육과정</th>
+				<td>&nbsp;&nbsp;
+					<select style="width:130px">
+						<option selected disabled hidden>교육과정</option>
+						<option>오픈워터</option>
+						<option>어드벤스드</option>
+						<option>마스터</option>
+						<option>레스큐</option>
+						<option>나이트록스</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th>패키지신청</th>
+				<td>&nbsp;&nbsp;
+					<select style="width:130px">
+						<option selected disabled hidden>	패키지신청</option>
+						<option>오픈워터</option>
+						<option>어드벤스드</option>	
+					</select>
+				</td>
+			</tr>
+			<tr style="height:0">
+				<th>
+					교육시간
+				</th>
+				<td><br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;평일오전 (월 ~ 금요일 : 09:00 ~ 13:30)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;평일오후 (월 ~ 금요일 : 13:30 ~ 17:30)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;평일저녁 (월 ~ 금요일 : 19:00 ~ 22:00)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;토요일오전 (토요일 : 09:00 ~ 13:30)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;토요일오후 (토요일 : 13:30 ~ 18:00)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;일요일오전 (일요일 : 09:00 ~ 13:00)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;일요일오후 (일요일 : 09:00 ~ 13:00)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time">&nbsp;&nbsp;개인강습 (원하는 시간과 날짜를 적어주세요)</label>
+					<br>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text">
+					<br><br>
+				</td>
+			</tr>
+			<tr>
+				<th>입금계좌</th>
+				<td>&nbsp;&nbsp;한국은행 111-1111-1111-11(QWERTY)</td>
+			</tr>
+		</table>	
+		</figure>
+
+			<input class="button1" type="submit" value="신청">
+			<input class="button2" type="reset" value="취소">
+	</form>
+	</div>
+	<!-- 교육신청 글쓰기 FORM -->
+	</div>
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+	
+	
+	</section>
+	
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<link type="text/css" href="../css/goods.css" rel="stylesheet">
+</head>
+<body>
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+<section id="goods">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>	
+	
+	<div id="goods_nav">
+		<ul>
+			<li><button>스쿠버 장비</button></li>
+			<li><button>기타</button></li>
+		</ul>
+	</div>
+	
+	<div id="goods_content">
+		<h1><b>스쿠버 장비</b></h1><br><br><br>
+		<p>스쿠버다이빙 장비는 직접 파는것이 아니고 행사하는 상품을 한정적으로 판매하는 것이기 때문에</p>
+		<p>더욱 저렴하게 구입 가능합니다!</p>
+		<p>------------------------------------------------------------------------------</p>
+		<div id="goods_list">
+		
+			<form action="goods.html"method="post">
+			
+				<table>
+					<tr>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>호흡기세트</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>스쿠버다이빙 슈트 5mm</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>롤백</td>
+					</tr>
+					<tr>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>스쿠버전용 마스크</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>마스크 김서림 방지액</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>내 관심</td>
+					</tr>
+				</table>
+				<input type="button" value="글쓰기">
+			</form>
+		</div>
+		
+		<div id="goods_application">
+		<form action="goods.html" method="post">
+			<table>
+				<tr>
+					<th>이름</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="이름을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>비밀번호</th>
+					<td>&nbsp;&nbsp;<input type="password" size="40" placeholder="비밀번호를 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>제목</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="제목을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>내용(최대 300자)</th>
+					<td>&nbsp;&nbsp;<textarea class="form-control" rows="20" name="bo_content" id="bo_content">${smarteditorVO.bo_content}</textarea></td>
+				</tr>
+				<tr>
+					<th>첨부파일1</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>
+				<tr>
+					<th>첨부파일2</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>				
+			</table>
+			<input class="button1" type="submit" value="작성">
+			<input class="button2" type="reset" value="취소">
+		</form>
+		</div>
+		
+		<div id="goods_detail">
+		
+	
+		</div>
+		
+		<div id="goods_etc">
+			<ul>
+				<li>
+					<br>
+					<h2 style='color:#ff0a00'><b>스쿠버다이빙 장비 세트</b></h2>
+					<h3><b>40,000원 (1일)</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<p>부츠, 장갑, 모자</p>
+					<p>호흡기, BCD</p>
+					<br><br>		
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<br><br><br><br><br>
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>랜턴</p>
+					<br><br><br><br><br><br><br>					
+				</li>
+			</ul>
+		
+		</div>
+	
+	</div>
+	
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+	</div>
+	
+	</section>
+
+
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/index.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+	<section id="index">
+		<div id="picture">
+			<div>
+				<div><img src="../images/index_main1.png" width="1663px"></div>
+				<div><img src="../images/index_main2.png" width="1663px"></div>
+				<div><img src="../images/index_main3.g" width="1663px"></div>
+			</div>
+				<ul class="bullet">
+					<li></li>
+					<li></li>
+					<li></li>
+				</ul>
+		
+		</div>
+		
+
+		<div id="product">
+			<ul>
+				<li><img src="../images/product1.png"></li>
+				<li><img src="../images/product2.png"></li>
+				<li><img src="../images/product3.png"></li>
+			</ul>
+		
+		</div>	
+	
+	
+		<div id="stone">
+			<div>강사 소개</div>
+			<div>투어 계획</div>
+			<div>이벤트</div>
+			<div>투어 후기</div>
+			<div>상품</div>
+		</div>
+		
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+	</section>
+	
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/intro.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+</head>
+<body>
+		<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+	<section id="intro">
+
+		<div id="header" align="center">
+			<img src="../images/header_logo.png" align="middle">
+		</div>
+		
+		<div id="intro_nav">
+			<ul>
+				<li><button>인사말</button></li>
+				<li><button>강사진 소개</button></li>
+			</ul>
+		</div>
+		
+		<div id="greeting">
+			<h3>인사말</h3>
+			<textarea class="greeting" cols="30" rows="25" readonly="readonly" disabled>안                             녕                              하                              세                              요                              감                              사                              합                              니                              다.
+			</textarea>
+		
+		
+			<div id="teacher">
+				<table>
+					<tr>
+						<td>
+							<figure>
+							<img src="../images/sponge.png" alt="스폰지밥">
+								<figcaption>
+									<h2>이주호</h2>
+									<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+									<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+									<p>가는 열락의 소리다 이것은 피어니가 전인 	유</p>
+									<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+									<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+									<p>춘에서만 구할 수 있다.</p>
+								</figcaption>
+							</figure>
+						</td>
+						<td>
+							<figure>	
+							<img src="../images/jingjinge.png" alt="징징이">
+								<figcaption>
+									<h2>김대영</h2>
+									<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+									<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+									<p>가는 열락의 소리다 이것은 피어니가 전인 유</p>
+									<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+									<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+									<p>춘에서만 구할 수 있다.</p>
+								</figcaption>
+							</figure>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<figure>	
+							<img src="../images/ddoongE.png" alt="뚱이">
+								<figcaption>	
+								<h2>권재우</h2>
+								<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+								<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+								<p>가는 열락의 소리다 이것은 피어니가 전인 유</p>
+								<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+								<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+								<p>춘에서만 구할 수 있다.</p>
+								</figcaption>
+							</figure>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		
+		<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+		
+	</section>
+		<footer>
+		<div class="copy">
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+</body>
+</html><!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+		<title>SCUBA DIVERS</title>
+		<link type="text/css" href="../css/login.css" rel="stylesheet">
+		<link type="text/css" href="../css/common.css" rel="stylesheet">
+		<link type="text/css" href="../css/common2.css" rel="stylesheet">
+	</head>
+	<body>
+	
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+		<section id="form">
+
+		<div id="header" align="center">
+			<img src="../images/header_logo.png" align="middle">
+		</div>
+
+		<div id="form_content" align="center">
+		<div id="login_form">
+<h3>[로그인]</h3>
+	<form action="login.html" method="post">
+		<table>
+			<tr>
+				<th>* 아이디</th>
+				<td><input type="text"></td>
+			</tr>
+			<tr>
+				<th>* 비밀번호</th> 
+				<td><input type="password" size="21"></td>
+			</tr>
+		</table>
+		<input class="button1" type="submit" value="로그인">
+		<input class="button2" type="reset" value="취소">
+	</form>
+</div>
+<div id="join_form">
+<h3>[회원가입]</h3>
+	<form action="join.html" method="post">
+		<table>
+			<tr>
+				<th>회원 ID</th>
+				<td><input type="text">[ID 중복 검사]</td>				
+			</tr>
+			<tr>
+				<th>비밀번호</th>
+				<td><input type="password"></td>
+			</tr>
+			<tr>
+				<th>비밀번호 확인</th>
+				<td><input type="password"></td>
+			</tr>
+			<tr>
+				<th>이름</th>
+				<td><input type="text"></td>
+			</tr>
+			<tr>
+				<th>성별</th>
+				<td>
+					<input type="radio" name="sex" value="남성">남성
+					<input type="radio" name="sex" value="여성">여성
+				</td>
+			</tr>
+			<tr>
+				<th>집전화</th>
+				<td><input type="text"></td>
+			</tr>
+			<tr>
+				<th>휴대전화</th>
+				<td><input type="text"></td>
+			</tr>
+			<tr>
+				<th>이메일</th>
+				<td><input type="text"></td>
+			</tr>
+			<tr>
+				<th rowspan="3">주소</th>
+				<td>
+					<input type="text" placeholder="우편번호">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" placeholder="도로명주소">
+					<input type="text" placeholder="지번주소">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="text" placeholder="나머지 주소">
+				</td>
+			</tr>
+		</table>
+		<input class="button1" type="submit" value="회원가입">
+		<input class="button2" type="reset" value="취소">
+	</form>
+</div>
+</div>
+		<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+
+	</section>
+	
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+	
+	</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/post.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+
+</head>
+<body>
+
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+	<section id="post">
+	
+		<div id="header" align="center">
+			<img src="../images/header_logo.png" align="middle">
+		</div>
+	
+		<div id="post_content">
+		
+				<h1><b>수강생 후기</b></h1>
+					
+		<div id="post_list">
+		<!-- 수강생 후기 테이블 FORM -->
+		<form action="post.html" method="post">
+			<figure>
+				<figcaption>
+					<h3 style='color:#00bfff'><b>Total 1건 1페이지</b></h3>
+					<br>
+				</figcaption>
+			<table>
+				<thead>
+					<tr>
+						<th>번호</th>
+						<th>제목</th>
+						<th>글쓴이</th>
+						<th>날짜</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<th></th>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+		</figure>
+		<br><br>
+		<input type="button" value="글쓰기">
+	</form>	
+	</div>
+	<!-- 수강생 후기 테이블 FORM -->	
+	
+	<div id="post_application">
+		<form action="post.html" method="post">
+			<table>
+				<tr>
+					<th>이름</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="이름을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>비밀번호</th>
+					<td>&nbsp;&nbsp;<input type="password" size="40" placeholder="비밀번호를 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>제목</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="제목을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>내용(최대 300자)</th>
+					<td>&nbsp;&nbsp;<textarea class="form-control" rows="20" name="bo_content" id="bo_content">${smarteditorVO.bo_content}</textarea></td>
+				</tr>
+				<tr>
+					<th>첨부파일1</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>
+				<tr>
+					<th>첨부파일2</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>				
+			</table>
+			<input class="button1" type="submit" value="작성">
+			<input class="button2" type="reset" value="취소">
+		</form>
+	</div>
+	
+	
+	<div id="post_detail">
+		
+	
+	</div>
+	
+	
+	</div>
+	
+	
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+		</div>
+	
+	</section>
+<script type="text/javascript">
+$(function(){
+	var oEditor = [];
+	var ctx = getContextPath();
+	var formBtn = $("#formBtn");
+	
+	nhn.husky.EZCreator.createInIFrame({
+		oAppRef : oEditors,
+		elPlaceHolder : "bo_content",
+		sSkinURI : "../SmartEditor/SmartEditor2Skin.html",
+		fCreator : "createSEditor2"
+	});
+
+formBtn.on("click", function(e)){
+	e.preventDefault();
+	if ($("#bo_title").val() == ""){
+		alert("제목을 입력해주세요.");
+		$("#bo_title").focus();
+		return
+	}
+	
+}
+
+})
+
+
+
+</script>
+
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+
+</body>
+</html>$(function(){
+	$(".bullet>li:nth-child(1)").click(function(){
+		$("#picture div div:nth-child(1) img").css("height","100%");
+		$("#picture div div:nth-child(2) img").css("height","0");
+		$("#picture div div:nth-child(3) img").css("height","0");
+	});
+	$(".bullet>li:nth-child(2)").click(function(){
+		$("#picture div div:nth-child(1) img").css("height","0");
+		$("#picture div div:nth-child(2) img").css("height","100%");
+		$("#picture div div:nth-child(3) img").css("height","0");
+	});
+	$(".bullet>li:nth-child(3)").click(function(){
+		$("#picture div div:nth-child(1) img").css("height","0");
+		$("#picture div div:nth-child(2) img").css("height","0");
+		$("#picture div div:nth-child(3) img").css("height","100%");
+	});
+});
+function login(num){
+	if(num == 1){
+		document.getElementById("login_form").style.visibility='visible';
+		document.getElementById("join_form").style.visibility='hidden';
+	}
+	else{
+		document.getElementById("login_form").style.visibility='hidden';
+		document.getElementById("join_form").style.visibility='visible';
+	}
+}
+function intro(num){
+	if(num == 1){
+		document.getElementById("greeting").style.visibility='visible';
+		document.getElementById("teacher").style.visibility='hidden';
+	}
+	else{
+		document.getElementById("greeting").style.visibility='hidden';
+		document.getElementById("teacher").style.visibility='visible';
+	}
+}
+function edu(num){
+	if(num == 1){
+		document.getElementById("edu_curriculum").style.visibility='visible';
+		document.getElementById("edu_list").style.visibility='hidden';
+		document.getElementById("edu_application").style.visibility='hidden';
+	}
+	else if(num == 2){
+		location.href="../BoardServlet?command=board1_list";
+	}
+	else if (num == 3){
+		document.getElementById("edu_curriculum").style.visibility='hidden';
+		document.getElementById("edu_list").style.visibility='hidden';
+		document.getElementById("edu_application").style.visibility='visible';
+	}
+}
+function post(num){
+	if(num == 1){
+		document.getElementById("post_list").style.visibility='visible';
+		document.getElementById("post_application").style.visibility='hidden';
+	}
+	else if(num == 2){
+		document.getElementById("post_list").style.visibility='hidden';
+		document.getElementById("post_application").style.visibility='visible';
+	}
+}
+function goods(num){
+	if(num == 1){
+		document.getElementById("goods_list").style.visibility='visible';
+		document.getElementById("goods_application").style.visibility='hidden';
+		document.getElementById("goods_etc").style.visibility='hidden';
+	}
+	else if (num == 2){
+		document.getElementById("goods_list").style.visibility='hidden';
+		document.getElementById("goods_application").style.visibility='hidden';
+		document.getElementById("goods_etc").style.visibility='visible';
+	}
+}
+function goods_write(){
+		document.getElementById("goods_list").style.visibility='hidden';
+		document.getElementById("goods_application").style.visibility='visible';
+		document.getElementById("goods_etc").style.visibility='hidden';
+}
+function community(num){
+	if(num == 1){
+		document.getElementById("community_list").style.visibility='visible';
+		document.getElementById("community_application").style.visibility='hidden';
+		document.getElementById("community_detail").style.visibility='hidden';
+		document.getElementById("community_board").style.visibility='hidden';
+		document.getElementById("community_upload").style.visibility='hidden';
+	}
+	else if(num == 2){
+		document.getElementById("community_list").style.visibility='hidden';
+		document.getElementById("community_application").style.visibility='visible';
+		document.getElementById("community_detail").style.visibility='hidden';
+		document.getElementById("community_board").style.visibility='hidden';
+		document.getElementById("community_upload").style.visibility='hidden';
+	}
+	else if(num == 3){
+		document.getElementById("community_list").style.visibility='hidden';
+		document.getElementById("community_application").style.visibility='hidden';
+		document.getElementById("community_detail").style.visibility='hidden';
+		document.getElementById("community_board").style.visibility='visible';
+		document.getElementById("community_upload").style.visibility='hidden';
+	}
+}
+
+function community_upload(){
+		document.getElementById("community_list").style.visibility='hidden';
+		document.getElementById("community_application").style.visibility='hidden';
+		document.getElementById("community_detail").style.visibility='hidden';
+		document.getElementById("community_board").style.visibility='hidden';
+		document.getElementById("community_upload").style.visibility='visible';
+}
+function loginCheck(){
+		if (document.getElementsByName("frm")[0].userid1.value.length == 0){
+			alert("아이디를 입력하세요");
+			document.getElementsByName("frm")[0].userid1.focus();
+			return false;
+		}
+		if (document.getElementsByName("frm")[0].pwd1.value.length == 0){
+			alert("비밀번호를 입력하세요");
+			document.getElementsByName("frm")[0].pwd1.focus();
+			return false;
+		}
+		return true;
+}
+function joinCheck(){
+		if (document.getElementsByName("frm")[1].userid2.value.length == 0){
+			alert("아이디를 입력하세요");
+			document.getElementsByName("frm")[1].userid2.focus();
+			return false;
+		}
+		if (document.getElementsByName("frm")[1].pwd2.value.length == 0){
+			alert("비밀번호를 입력하세요");
+			document.getElementsByName("frm")[1].pwd2.focus();
+			return false;
+		}
+		if (document.getElementsByName("frm")[1].name.value.length == 0){
+			alert("이름을 입력하세요");
+			document.getElementsByName("frm")[1].name.focus();
+			return false;
+		}
+		return true;
+}<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<link type="text/css" href="../css/community.css" rel="stylesheet">
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<c:if test="${empty param.command}">
+	<script>
+		location.href="../BoardServlet?command=board4_list";
+	</script>
+</c:if>
+<jsp:include page="header.jsp"/>
+	
+<section id="community">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="community_nav">
+		<ul>
+			<li><button onclick="community(1)">공지사항</button></li>
+			<li><button onclick="location.href='../BoardServlet?command=bulletin_list'">사진게시판</button></li>
+		</ul>
+	</div>
+	
+	<div id="community_content">
+	
+		<div id="community_list">
+			
+			<h1><b>공지사항</b></h1>
+			<p>-------------------</p>
+		
+			<form action="community.jsp" method="post">
+				<figure>
+					<figcaption>
+						<h3 style='color:#00bfff'><b>Total 1건 1페이지</b></h3>
+						<br>
+					</figcaption>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>번호</th>
+								<th>제목</th>
+								<th>글쓴이</th>
+								<th>날짜</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="board" items="${boardList4}">
+								<tr>
+									<th>${board.num}</th>
+									<td>${board.title}</td>
+									<td>${board.name}</td>
+									<td><fmt:formatDate value="${board.writedate}" type="date"/></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</figure>
+				<br><br>
+				<input type="button" value="글쓰기" onclick="location.href='../BoardServlet?command=board4_write_form'">
+			</form>	
+		</div>
+	<div id="community_application">
+		<h1><b>공지사항</b></h1>
+		<p>-------------------</p>
+		<form action="../BoardServlet?command=board4_write" method="post" encType="multipart/form-data">
+			<input type="hidden" name="userid" value="${loginUser.userid}">
+			<table>
+				<tr>
+					<th>이름</th>
+					<td>&nbsp;&nbsp;<input type="text" name="name" value="${loginUser.name}" size="40" placeholder="이름을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>비밀번호</th>
+					<td>&nbsp;&nbsp;<input type="password" name="pass" value="${loginUser.pwd}" size="40" placeholder="비밀번호를 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>제목</th>
+					<td>&nbsp;&nbsp;<input name="title" type="text" size="40" placeholder="제목을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>내용(최대 300자)</th>
+					<td>&nbsp;&nbsp;<textarea id="textTest" name="content" class="content"></textarea></td>
+				</tr>
+				<tr>
+					<th>첨부파일1</th>
+					<td>&nbsp;&nbsp;<input name="file1" type="file"></td>
+				</tr>
+				<tr>
+					<th>첨부파일2</th>
+					<td>&nbsp;&nbsp;<input name="file2" type="file"></td>
+				</tr>				
+			</table>
+			<input class="button1" type="submit" value="작성">
+			<input class="button2" type="reset" value="취소">
+		</form>
+	</div>
+	<script type="text/javascript" 
+			src="../naver-smarteditor2-ca95d21/demo/js/service/HuskyEZCreator.js" 
+			charset="utf-8">
+	</script>
+	<script type="text/javascript">
+		var oEditors=[];
+		nhn.husky.EZCreator.createInIFrame({oAppRef:oEditors,
+			elPlaceHolder:"textTest",
+			sSkinURI:"../naver-smarteditor2-ca95d21/demo/SmartEditor2Skin.html",
+			htParams:{
+				bUseToolbar:true,
+				bUseVerticalResizer:true,
+				bUseModeChanger:true
+			}
+		});
+		function submitContents(){
+			oEditors.getById["class_tutorIntroduce"].exec("UPDATE_CONTENTS_FIELD",[]);
+		}
+	</script>
+
+	<div id="community_detail">
+		<h1><b>공지사항</b></h1>
+		<p>-----------------</p>
+	</div>
+	
+	<div id="community_board">
+		<h1><b>사진 게시판</b></h1>
+		<br>
+		<p>-----------------------</p>
+		<table border="10">
+			<tr>
+				<%int num = 0; %>
+				<c:forEach var="board" items="${bulletin}">
+					<c:if test="${board.pictureurl!='no-image'}">
+						<td><img width="369px" height="251px" src="../upload/${board.pictureurl}"><%num++; %></td>
+					</c:if>
+					<%if(num==3){ %>
+						</tr><tr>
+					<%} %>
+					<%if(num==6)break; %>	
+				</c:forEach>
+				<c:if test="<%=3<num%>">
+					<c:forEach begin="1" end="<%=6-num%>">
+						<td></td>
+					</c:forEach>
+				</c:if>
+				<c:if test="<%=num<3%>">
+					<c:forEach begin="1" end="<%=3-num%>">
+						<td></td>
+					</c:forEach>
+				</c:if>
+				<c:if test="<%=num==3%>">
+					<td></td>
+					<td></td>
+					<td></td>
+				</c:if>
+			</tr>			
+			<c:if test="<%=num<3%>">
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</c:if>
+		</table>
+		<input type="button" value="사진 올리기" onclick="community_upload()">
+	</div>
+	
+	<div id="community_upload">
+	
+		<h1><b>사진 게시판</b></h1>
+		<br>
+		<p>----------------------</p>	
+	
+		<form action = "../BoardServlet?command=bulletin_write" name="frm" enctype="multipart/form-data" method="post">
+			<div>
+				<input type="file" style="width:1663px; height:550px;" name="file" />
+			</div>
+			<input type="submit" value="사진 업로드">
+		</form>
+        
+    </div>
+</div>
+	
+	<div id="footer">
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>
+
+<jsp:include page="footer.jsp"/>
+<c:if test="${param.command=='view_list'}">
+	<script>
+			community(1);
+	</script>
+</c:if>
+<c:if test="${param.command=='view_application'}">
+	<script>
+		community(2);
+	</script>
+</c:if>
+<c:if test="${param.command=='view_bulletin'}">
+	<script>
+		community(3);
+	</script>
+</c:if>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/edu.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+
+<jsp:include page="header.jsp"/>
+	
+<section id="edu">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="edu_nav">
+		<ul>
+			<li><button onclick="edu(1);">스쿠버다이빙 교육과정</button></li>
+			<li><button onclick="edu(2);">스쿠버다이빙 교육신청</button></li>
+		</ul>
+	</div>
+	
+	<div id="edu_content">
+	<div id="edu_curriculum">
+	
+	<!-- 스쿠버 다이빙 교육과정 -->
+		<br><br>
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육과정</h1>
+		
+		<ul>
+		    <!-- 오픈워터 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>오픈워터 교육과정</b></h2>
+				<h3><b>700,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Openwater Driver Course</small></p>
+				<p class="course"><span>1박 2일 패키지 : 600,000원</span></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만 10세 이상</p>
+				<p><b>교육기간 : </b> 2박 3일 소요(권장)</p>
+				<p><b>준비물 : </b> 수영복, 개인도구, 선크림</p>
+				<p><b>최대수심 : </b> 18m</p>
+				<p><b>교육장소 : </b> 강원도 고성, 양양, 제주도, 해외</p>
+				<p><b>포함사항 : </b> 교재 및 라이센스 발급, 장비대여,</p>
+				<p>보트이용, 이론수업, 수영장교육, 개방수역(4회),</p>
+				<p> 중식(2회), 숙박, 수중기념사진, 로그북 증정</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 오픈워터 교육과정 -->
+			
+			<!-- 어드벤스드 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>어드벤스드 교육과정</b></h2>
+				<h3><b>600,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Advanced Openwater Driver Course</small></p>
+				<p class="course"><span>1박 2일 패키지 : 550,000원</span></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 오픈워터 다이버 자격증 소지자</p>
+				<p><b>교육기간 : </b> 1박 2일</p>
+				<p><b>준비물 : </b> 수영복, 개인도구, 선크림</p>
+				<p><b>최대수심 : </b> 35m</p>
+				<p><b>교육장소 : </b> 스페셜티 코스에 따른 다양한 </p>
+				<p>펀다이빙 포인트</p>
+				<p><b>포함사항 : </b> 교재 및 라이센스 발급, 장비대여,</p>
+				<p>보트이용, 이론수업, 개방수역(5회), 중식(1회), </p>
+				<p>숙박, 수중기념사진, 로그북 증정</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 어드벤스드 교육과정 -->
+			
+			<!-- 마스터 교육과정 -->
+			<li>
+				<h2 style='color:#ff0a00'><b>마스터 교육과정</b></h2>
+				<h3><b>별도 문의</b></h3>
+				<p class="course"><small>Drive Master Course</small></p>
+				<br><br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만19세 이상 / 레스큐 이상의 소지자</p>
+				<p><b>준비물 : </b> 50회 이상의 기록된 다이빙, </p>
+				<p>24개월 이내에 갱신된 응급처치 자격증, 수영복,</p>
+				<p>샤워용품</p>
+				<p><b>교육기간 : </b> 7일</p>
+				<p><b>장소 : </b> 스페셜티 코스에 따른 다양한 </p>
+				<p>펀다이빙 포인트</p>
+				<p><b>불포함사항 : </b> 카풀비용, 교육외 개인비용</p>
+				<p><b>기타 사항 : </b> 숙소는 4인 1실 기준이며,</p>
+				<p>1인실(개인)숙박 또는 커플 혼숙 요청시에는</p>
+				<p>숙박이용이 추가됩니다.</p>
+				<br>
+			</li>
+			<!-- 마스터 교육과정 -->
+			
+			<!-- 나이트록스 교육과정 -->
+			<li>
+				
+				<h2 style='color:#ff0a00'><b>나이트록스 교육과정</b></h2>
+				<h3><b>200,000원</b><small>(추가 비용 X)</small></h3>
+				<p class="course"><small>Nitrox Driver Course</small></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 오픈워터 다이버 자격증 이상의 소지자</p>
+				<p><b>교육기간 : </b> 1일 소요</p>
+				<p><b>준비물 : </b> 계산기, 필기도구</p>
+				<p><b>교육장소 : </b> 서울/제주 교육센터</p>
+				<p><b>포함사항 : </b> 교재 및 라이센트 발급, 이론수업, </p>
+				<p>나이트롤스 해양실습(선택), 중식</p>
+				<br><br><br><br><br><br>
+			</li>
+			<!-- 나이트록스 교육과정 -->
+			
+			<!-- 레스큐 교육과정 -->
+			<li>
+
+				<h2 style='color:#ff0a00'><b>레스큐 교육과정</b></h2>
+				<h3><b>600,000원</b><small>(추가 비용X)</small></h3>
+				<p class="course"><small>Rescue Driver Course</small></p>
+				<br>
+				<p>------------------------------------------</p>
+				<br>
+				<p><b>대상 : </b> 만 12세 이상 / 오픈워터 다이버 자격증 </p>
+				<p>이상의 소지자</p>
+				<p><b>교육기간 : </b> 1일 소요</p>
+				<p><b>준비물 : </b> 수영복, 개인세면도구, 선크림</p>
+				<p><b>교육장소 : </b> 이론교육, 수영장, 해양실습</p>
+				<p><b>포함사항 : </b> 교재 및 라이센트 발급, 이론수업, </p>
+				<p>장비대여, 제한수역교육, 개방수역교육(5회),</p> 
+				<p>중식</p>
+				<br><br><br><br><br><br>
+			</li>
+			<!-- 레스큐 교육과정 -->
+		</ul>
+		<!-- 스쿠버 다이빙 교육과정 -->
+	</div>
+		
+		<!-- 스쿠버 다이빙 교육신청 -->
+	<div id="edu_list">
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육신청</h1><br><br>
+		
+	<!-- 교육신청 현황 테이블 FORM -->		
+		<form>
+			<figure>
+				<figcaption>
+					<h3 style='color:#00bfff'><b>스쿠버다이빙 세계에 오신걸 환영합니다!</b></h3>
+					<br>
+				</figcaption>
+				<table border="1">
+					<thead>
+						<tr>
+							<th>번호</th>
+							<th>제목</th>
+							<th>글쓴이</th>
+							<th>날짜</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="board" items="${boardList}">
+							<tr>
+								<th>${board.num}</th>
+								<td>${board.title}</td>
+								<td>${board.name}</td>
+								<td><fmt:formatDate value="${board.writedate}" type="date"/></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</figure>
+			<br><br>
+			<input type="button" value="글쓰기" onclick="edu(3);">
+		</form>	
+	</div>
+	<!-- 교육신청 현황 테이블 FORM -->
+	
+	<!-- 교육신청 글쓰기 FORM -->
+	<div id="edu_application">
+		<h1>스쿠버 다이빙</h1><br>
+		<h1>교육신청</h1><br><br>
+   	
+		<form action="../BoardServlet" name="frm" method="get">
+			<input type="hidden" name="command" value="board1_write">
+			<figure>
+				<figcaption> 
+					<h3 style='color:#00bfff'><b>스쿠버다이빙 세계에 오신걸 환영합니다!</b></h3><br>
+				</figcaption>
+				<table>
+					<tr>
+						<th>제목</th>
+						<td>&nbsp;&nbsp;<input type="text" name="title" size="40" placeholder="내용을 입력해주세요" ></td>
+					</tr>
+					<tr>
+						<th>비밀번호</th>
+						<td>&nbsp;&nbsp;<input type="password" name="pass" size="40" placeholder="내용을 입력해주세요" ></td>
+					</tr>			
+					<tr>
+						<th>이름</th>
+						<td>&nbsp;&nbsp;<input type="text" name="name" size="40" placeholder="내용을 입력해주세요" ></td>
+					</tr>		
+					<tr>
+						<th>연락처</th>
+						<td>&nbsp;&nbsp;<input type="tel" name="phone" size="40" placeholder="내용을 입력해주세요" ></td>
+					</tr>
+					<tr>
+						<th>교육지점</th>
+						<td>&nbsp;&nbsp;
+							<select name="space" style="width:130px">
+								<option selected disabled hidden>교육지점</option>
+								<option value="0">서울</option>
+								<option value="1">제주</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>교육과정</th>
+						<td>&nbsp;&nbsp;
+							<select name="subject" style="width:130px">
+								<option selected disabled hidden>교육과정</option>
+								<option value="0">오픈워터</option>
+								<option value="1">어드벤스드</option>
+								<option value="2">마스터</option>
+								<option value="3">레스큐</option>
+								<option value="4">나이트록스</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th>패키지신청</th>
+						<td>&nbsp;&nbsp;
+							<select name="pack" style="width:130px">
+								<option selected disabled hidden>	패키지신청</option>
+								<option value="0">오픈워터</option>
+								<option value="1">어드벤스드</option>	
+							</select>
+						</td>
+					</tr>
+					<tr style="height:0">
+						<th>
+							교육시간
+						</th>
+						<td><br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="0">&nbsp;&nbsp;평일오전 (월 ~ 금요일 : 09:00 ~ 13:30)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="1">&nbsp;&nbsp;평일오후 (월 ~ 금요일 : 13:30 ~ 17:30)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="2">&nbsp;&nbsp;평일저녁 (월 ~ 금요일 : 19:00 ~ 22:00)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="3">&nbsp;&nbsp;토요일오전 (토요일 : 09:00 ~ 13:30)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="4">&nbsp;&nbsp;토요일오후 (토요일 : 13:30 ~ 18:00)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="5">&nbsp;&nbsp;일요일오전 (일요일 : 09:00 ~ 13:00)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="6">&nbsp;&nbsp;일요일오후 (일요일 : 09:00 ~ 13:00)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="time" value="7" onclick='Nfocus();'>&nbsp;&nbsp;개인강습 (원하는 시간과 날짜를 적어주세요)</label>
+							<br>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="focus">
+							<br><br>
+						</td>
+					</tr>
+					<tr>
+						<th>입금계좌</th>
+						<td>&nbsp;&nbsp;한국은행 111-1111-1111-11(QWERTY)</td>
+					</tr>
+				</table>	
+			</figure>
+
+			<input class="button1" type="submit" value="신청">
+			<input class="button2" type="reset" value="취소">
+			<script>
+				function Nfocus(){
+    				document.getElementsByName('focus')[0].focus();
+				}
+			</script>
+		</form>
+	</div>
+	<!-- 교육신청 글쓰기 FORM -->
+	</div>
+	<div id="footer">
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>
+
+<jsp:include page="footer.jsp"/>
+<c:if test="${param.command=='view_list'}">
+	<script>
+		document.getElementById("edu_curriculum").style.visibility='hidden';
+		document.getElementById("edu_list").style.visibility='visible';
+		document.getElementById("edu_application").style.visibility='hidden';
+	</script>
+</c:if>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+</head>
+<body>
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<link type="text/css" href="../css/goods.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<c:if test="${empty param.command}">
+	<script>
+		location.href='../BoardServlet?command=board3_list';
+	</script>
+</c:if>
+<jsp:include page="header.jsp"/>
+
+<section id="goods">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>	
+	
+	<div id="goods_nav">
+		<ul>
+			<li><button onclick="goods(1)">스쿠버 장비</button></li>
+			<li><button onclick="goods(2)">기타</button></li>
+		</ul>
+	</div>
+	
+	<div id="goods_content">
+		<h1><b>스쿠버 장비</b></h1><br><br><br>
+		<p>스쿠버다이빙 장비는 직접 파는것이 아니고 행사하는 상품을 한정적으로 판매하는 것이기 때문에</p>
+		<p>더욱 저렴하게 구입 가능합니다!</p>
+		<p>------------------------------------------------------------------------------</p>
+		<div id="goods_list">
+			<form action="goods.jsp"method="post">	
+				<table>
+					<tr>
+						<%int num = 0; %>
+						<c:forEach var="board" items="${boardList3}">
+							<c:if test="${board.pictureurl1!='no-image'}">
+								<td><img width="369px" height="251px" src="../upload/${board.pictureurl1}"><%num++; %></td>
+							</c:if>
+							<%if(num==3){ %>
+								</tr><tr>
+							<%} %>
+							<%if(num==6)break; %>
+								<c:if test="${board.pictureurl2!='no-image'}">
+									<td><img width="369px" height="251px" src="../upload/${board.pictureurl2}"><%num++; %></td>
+								</c:if>	
+							<%if(num==3){ %>
+								</tr><tr>
+							<%} %>
+							<%if(num==6)break; %>	
+						</c:forEach>
+					</tr>			
+				</table>
+				<input type="button" value="글쓰기" onclick="location.href='../BoardServlet?command=board3_write_form'">
+			</form>
+		</div>
+		<div id="goods_application">
+			<form action="../BoardServlet?command=board3_write" method="post" encType="multipart/form-data">
+				<input type="hidden" name="userid" value="${loginUser.userid}">
+				<table>
+					<tr>
+						<th>이름</th>
+						<td>&nbsp;&nbsp;<input type="text" name="name" value="${loginUser.name}" readonly size="40" placeholder="이름을 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>비밀번호</th>
+						<td>&nbsp;&nbsp;<input type="password" name="pass" value="${loginUser.pwd}" readonly size="40" placeholder="비밀번호를 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>제목</th>
+						<td>&nbsp;&nbsp;<input type="text" name="title" size="40" placeholder="제목을 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>내용(최대 300자)</th>
+						<td>&nbsp;&nbsp;<textarea id="textTest" name="content" class="content"></textarea></td>
+					</tr>
+					<tr>
+						<th>첨부파일1</th>
+						<td>&nbsp;&nbsp;<input name="file1" type="file"></td>
+					</tr>
+					<tr>
+						<th>첨부파일2</th>
+						<td>&nbsp;&nbsp;<input name="file2" type="file"></td>
+					</tr>				
+				</table>
+				<input class="button1" type="submit" value="작성">
+				<input class="button2" type="reset" value="취소">
+			</form>
+		</div>
+		<script type="text/javascript" 
+				src="../naver-smarteditor2-ca95d21/demo/js/service/HuskyEZCreator.js"
+				charset="utf-8">
+		</script>
+		<script type="text/javascript">
+			var oEditors=[];
+			nhn.husky.EZCreator.createInIFrame({oAppRef:oEditors,
+				elPlaceHolder:"textTest",
+				sSkinURI:"../naver-smarteditor2-ca95d21/demo/SmartEditor2Skin.html",
+				htParams:{
+					bUseToolbar:true,
+					bUseVerticalResizer:true,
+					bUseModeChanger:true
+				}
+			});
+			function submitContents(){
+				oEditors.getById["class_tutorIntroduce"].exec("UPDATE_CONTENTS_FIELD",[]);
+			}
+		</script>
+		<div id="goods_detail">
+		
+		</div>
+		
+		<div id="goods_etc">
+			<ul>
+				<li>
+					<br>
+					<h2 style='color:#ff0a00'><b>스쿠버다이빙 장비 세트</b></h2>
+					<h3><b>40,000원 (1일)</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<p>부츠, 장갑, 모자</p>
+					<p>호흡기, BCD</p>
+					<br><br>		
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<br><br><br><br><br>
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>랜턴</p>
+					<br><br><br><br><br><br><br>					
+				</li>
+			</ul>
+		</div>
+	</div>
+	
+	<div id="footer">	
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>
+<jsp:include page="footer.jsp"/>
+<c:if test="${param.command=='view_application'}">
+	<script>
+		goods_write();
+	</script>
+</c:if>
+<c:if test="${param.command=='view_list'}">
+	<script>
+		goods(1);
+	</script>
+</c:if>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+</head>
+<body>
+<header>
+	<div id="login">
+		<c:if test="${loginUser==null}">
+			<ul>
+				<li><a href="../join.do">회원가입</a></li>
+				<li><a href="../login.do">로그인</a></li>	
+			</ul>
+		</c:if>
+		<c:if test="${loginUser!=null}">			
+			<ul>
+				<li><input type="button" value="로그아웃" onclick="location.href='../BoardServlet?command=logout'"></li>
+				<li style="color:white;">${loginUser.name}님 환영합니다.</li>
+			</ul>
+		</c:if>
+	</div>
+	<div id="logo">
+		<div align="center">
+			<a href="index.jsp">
+				<img src="../images/logo.png" align="middle">
+			</a>
+		</div>
+		<div>
+			<a href="https://section.cafe.naver.com/" target="_blank"><img src="../images/cafe.png" align="right"> </a>
+			<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src="../images/kakao2.png" align="right"></a>
+			<a href="https://www.instagram.com/?hl=ko" target="_blank"><img src="../images/instar.png" align="right"></a>
+			<a href="https://section.blog.naver.com/BlogHome.nhn" target="_blank"><img src="../images/blog.png" align="right"></a>
+		</div>
+	</div>
+	
+	<div id="nav">
+		<ul>
+			<li><a href="../jsp/intro.jsp">소개</a></li>
+			<li><a href="../jsp/edu.jsp">스쿠버다이빙 교육</a></li>
+			<li><a href="../jsp/post.jsp">후기</a></li>
+			<li><a href="../jsp/goods.jsp">상품</a></li>
+			<li><a href="../jsp/community.jsp">커뮤니티</a></li>
+		</ul>
+	</div>
+</header>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/index.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<c:if test="${not empty param.join_complete}">
+<script>
+alert("${param.join_complete}");
+</script>
+</c:if>
+<jsp:include page="header.jsp"/>
+<section id="index">
+	<div id="picture">
+		<div>
+			<div><img src="../images/index_main1.png" width="1663px"></div>
+			<div><img src="../images/index_main2.png" width="1663px"></div>
+			<div><img src="../images/index_main3.png" width="1663px"></div>
+		</div>
+		<ul class="bullet">
+			<li></li>
+			<li></li>
+			<li></li>
+		</ul>
+	</div>
+	<div id="product">
+		<ul>
+			<li><a href="../jsp/goods.jsp"><img src="../images/product1.png"></a></li>
+			<li><a href="../jsp/edu.jsp"><img src="../images/product2.png"></a></li>
+			<li><a href="../jsp/goods.jsp"><img src="../images/product3.png"></a></li>
+		</ul>
+	</div>
+			
+	<div id="stone">
+		<div><a href="intro.jsp?view=teacher"><b>강사 소개</b></a></div>
+		<div><a href="../BoardServlet?command=bulletin_list"><b>사진 게시판</b></a></div>
+		<div><a href="community.jsp"><b>공지 사항</b></a></div>
+		<div><a href="post.jsp?command=view_list"><b>후기</b></a></div>
+		<div><a href="goods.jsp?view=teacher"><b>상품</b></a></div>
+	</div>
+				
+	<div id="footer">		
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>	
+<jsp:include page="footer.jsp"/>
+</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/intro.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<jsp:include page="header.jsp"/>
+<section id="intro">
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="intro_nav">
+		<ul>
+			<li><button onclick="intro(1);">인사말</button></li>
+			<li><button onclick="intro(2);">강사진 소개</button></li>
+		</ul>
+	</div>
+	
+	<div id="intro_content">
+		<div id="greeting">
+			<h3>인사말</h3>
+			<textarea class="greeting"  cols="12" rows="25" readonly="readonly" disabled>어푸어푸....퐁당퐁당....
+			</textarea>
+		</div>
+		<div id="teacher">
+			<table>
+				<tr>
+					<td>
+						<figure>
+							<img src="../images/sponge.png" alt="스폰지밥">
+							<figcaption>
+								<h2>이주호</h2>
+								<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+								<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+								<p>가는 열락의 소리다 이것은 피어니가 전인 	유</p>
+								<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+								<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+								<p>춘에서만 구할 수 있다.</p>
+							</figcaption>
+						</figure>
+					</td>
+					<td>
+						<figure>	
+							<img src="../images/jingjinge.png" alt="징징이">
+							<figcaption>
+								<h2>김대영</h2>
+								<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+								<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+								<p>가는 열락의 소리다 이것은 피어니가 전인 유</p>
+								<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+								<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+								<p>춘에서만 구할 수 있다.</p>
+							</figcaption>
+						</figure>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<figure>	
+							<img src="../images/ddoongE.png" alt="뚱이">
+							<figcaption>	
+								<h2>권재우</h2>
+								<p>귀는 생의 찬미를 듣는다 그것은 웅대한 관현</p>
+								<p>악이며 미묘한 교향악이다 뼈 끝에 스며들어</p>
+								<p>가는 열락의 소리다 이것은 피어니가 전인 유</p>
+								<p>소년에게서 구하지 못할 바이며 시들어 다는</p>
+								<p>노년에게서 구하지 못할 바이며 오직 우리 청</p>
+								<p>춘에서만 구할 수 있다.</p>
+							</figcaption>
+						</figure>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="footer">	
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>	
+</section>
+<jsp:include page="footer.jsp"/>
+<c:if test="${param.view=='teacher'}">
+	<script>
+		intro(2);
+	</script>
+</c:if>
+</body>
+</html><%@page import="java.net.URLDecoder"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi">
+	<title>SCUBA DIVERS</title>
+	<link type="text/css" href="../css/login.css" rel="stylesheet">
+	<link type="text/css" href="../css/common.css" rel="stylesheet">
+	<link type="text/css" href="../css/common2.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+	<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<c:if test="${not empty param.join_complete}">
+	<script>
+		alert("${param.join_complete}");
+	</script>
+</c:if>
+<c:if test="${param.alarm=='need'}">
+	<script>
+		alert("로그인을 해주세요.");
+	</script>
+</c:if>
+<jsp:include page="header.jsp"/>
+<section id="form">
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	<div id="form_content" align="center">
+		<div id="login_form">
+			<h3>[로그인]</h3>
+			<form  action="../login.do" method="post" name="frm">
+				<table>
+					<tr>
+						<th>* 아이디</th>
+						<td><input type="text" size="21" name="userid1"></td>
+					</tr>
+					<tr>
+						<th>* 비밀번호</th> 
+						<td><input type="password" size="21" name="pwd1"></td>
+					</tr>
+				</table>
+				<input class="button1" type="submit" value="로그인" onclick="return loginCheck();">
+				<input class="button2" type="reset" value="취소">
+				<br><br>
+				<c:if test="${param.code==0}"><p>비밀번호가 틀립니다.</p></c:if>
+				<c:if test="${param.code==-1}"><p>존재하지 않는 회원입니다.</p></c:if>
+			</form>
+		</div>
+		<div id="join_form">
+			<h3>[회원가입]</h3>
+			<form action="../join.do" method="post" name="frm">
+				<table>
+					<tr>
+						<th>* 회원 ID</th>
+						<td><input type="text" name="userid2">[ID 중복 검사]</td>				
+					</tr>
+					<tr>
+						<th>* 비밀번호</th>
+						<td><input type="password" name="pwd2"></td>
+					</tr>
+					<tr>
+						<th>비밀번호 확인</th>
+						<td><input type="password"></td>
+					</tr>
+					<tr>
+						<th>* 이름</th>
+						<td><input type="text" name="name"></td>
+					</tr>
+					<tr>
+						<th>성별</th>
+						<td>
+							<input type="radio" checked="checked" name="sex" value="0">남성
+							<input type="radio" name="sex" value="1">여성
+						</td>
+					</tr>
+					<tr>
+						<th>집전화</th>
+						<td>
+							<input type="text" name="tel">
+						</td>
+					</tr>
+					<tr>
+						<th>휴대전화</th>
+						<td>
+							<input type="text" name="phone">
+						</td>
+					</tr>
+					<tr>
+						<th>이메일</th>
+						<td>
+							<input type="text" name="email">
+						</td>
+					</tr>
+					<tr>
+						<th rowspan="3">주소</th>
+						<td>
+							<input type="text" placeholder="우편번호">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" placeholder="도로명주소" name="address">
+							<input type="text" placeholder="지번주소">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" placeholder="나머지 주소">
+						</td>
+					</tr>
+				</table>
+				<input class="button1" type="submit" value="회원가입" onclick="return joinCheck();">
+				<input class="button2" type="reset" value="취소">
+			</form>
+		</div>
+	</div>
+	<div id="footer">	
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>
+<jsp:include page="footer.jsp"/>	
+	<c:if test="${param.form=='login' }">
+		<script>
+			login(1);
+		</script>
+	</c:if>
+	<c:if test="${param.form=='join' }">
+		<script>
+			document.getElementById("login_form").style.visibility="hidden";
+			document.getElementById("join_form").style.visibility="visible";
+		</script>
+	</c:if>
+	</body>
+</html><%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/post.css" rel="stylesheet">
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="../js/index.js" type="text/javascript"></script>
+</head>
+<body>
+<c:if test="${empty param.command}">
+	<script>
+		location.href="../BoardServlet?command=board2_list";
+	</script>
+</c:if>
+<jsp:include page="header.jsp"/>
+<section id="post">
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>
+	
+	<div id="post_content">
+		<h1><b>수강생 후기</b></h1>
+					
+		<div id="post_list">
+		<!-- 수강생 후기 테이블 FORM -->
+			<form action="post.jsp" method="post">
+				<figure>
+					<figcaption>
+						<h3 style='color:#00bfff'><b>Total 1건 1페이지</b></h3>
+						<br>
+					</figcaption>
+					<table border="1">
+						<thead>
+							<tr>
+								<th>번호</th>
+								<th>제목</th>
+								<th>글쓴이</th>
+								<th>날짜</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="board" items="${boardList2}" >
+								<tr>
+									<th>${board.num}</th>
+									<td>${board.title}</td>
+									<td>${board.name}</td>
+									<td><fmt:formatDate value="${board.writedate}" type="date"/></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+				</figure>
+				<br><br>
+				<input type="button" value="글쓰기" onclick="location.href='../BoardServlet?command=board2_write_form'">
+			</form>	
+		</div>
+	<!-- 수강생 후기 테이블 FORM -->	
+	
+		<div id="post_application">
+			<form action="../BoardServlet?command=board2_write" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="userid" value="${loginUser.userid}">
+				<table>
+					<tr>
+						<th>이름</th>
+						<td>&nbsp;&nbsp;<input name="name" value="${loginUser.name}" readonly type="text" size="40" placeholder="이름을 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>비밀번호</th>
+						<td>&nbsp;&nbsp;<input name="pass" value="${loginUser.pwd}" readonly type="password" size="40" placeholder="비밀번호를 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>제목</th>
+						<td>&nbsp;&nbsp;<input name="title" type="text" size="40" placeholder="제목을 입력해주세요"></td>
+					</tr>
+					<tr>
+						<th>내용(최대 300자)</th>
+						<td>&nbsp;&nbsp;<textarea id="textTest" name="content" class="content"></textarea></td>
+					</tr>
+					<tr>
+						<th>첨부파일1</th>
+						<td>&nbsp;&nbsp;<input type="file" name="file1"></td>
+					</tr>
+					<tr>
+						<th>첨부파일2</th>
+						<td>&nbsp;&nbsp;<input type="file" name="file2"></td>
+					</tr>				
+				</table>
+				<input class="button1" type="submit" value="작성">
+				<input class="button2" type="reset" value="취소">
+			</form>
+		</div>
+	
+		<script type="text/javascript" 
+				src="../naver-smarteditor2-ca95d21/demo/js/service/HuskyEZCreator.js"
+				charset="utf-8">
+		</script>
+		<script type="text/javascript">
+			var oEditors=[];
+			nhn.husky.EZCreator.createInIFrame({oAppRef:oEditors,
+				elPlaceHolder:"textTest",
+				sSkinURI:"../naver-smarteditor2-ca95d21/demo/SmartEditor2Skin.html",
+				htParams:{
+					bUseToolbar:true,
+					bUseVerticalResizer:true,
+					bUseModeChanger:true
+				}
+			});
+			function submitContents(){
+				oEditors.getById["class_tutorIntroduce"].exec("UPDATE_CONTENTS_FIELD",[]);
+			}
+		</script>
+		<div id="post_detail">
+		</div>
+	
+	</div>
+	<div id="footer">
+		<ul>
+			<li>
+				<h3>공지사항</h3>
+				<p>--------------------------</p>
+				<p>2020년 투어 계획</p>
+				<p>스쿠버다이빙 상품 할인 이벤...</p>	
+			</li>
+			<li>
+				<h3>교육문의</h3>
+				<p>--------------------------</p>
+				<p>-스쿠버교육 문의 드립니다.</p>
+				<p>-프리다이빙 교육 문의드려요~</p>
+				<p>-문의합니다...</p>
+			</li>
+			<li>
+				<h3>고객센터</h3>
+				<p>대표전화</p>
+				<p>tel) 010.1111.1111</p>
+				<a href="https://open.kakao.com/o/goTwijmc" target="_blank"><img src=../images/kakao.png></a>
+				<p>카카오톡ID : Scuba</p>
+			</li>
+		</ul>
+	</div>
+</section>
+<jsp:include page="footer.jsp"/>
+<c:if test="${param.command=='view_list'}">
+	<script>
+		post(1);
+	</script>
+</c:if>
+<c:if test="${param.command=='view_application'}">
+	<script>
+		post(2);
+	</script>
+</c:if>
+</body>
+</html>
+drop table member;
+drop table board1;
+drop table board2;
+drop table board3;
+drop table board4;
+drop table bulletin;
+commit;
+create table member(
+    num number(5) primary key,    -- 회원 번호
+    userid varchar2(15),                -- 회원 아이디
+    pwd varchar2(20),                   -- 회원 비밀번호
+    name varchar2(10),                 -- 회원 이름
+    sex number(1) default 0,          -- 성별
+    tel varchar(15),		     -- 집전화번호
+    phone varchar2(13),                 -- 휴대전화번호(필수)
+    email varchar2(20),                  -- 이메일주소
+    address varchar2(50)	     -- 집주소
+);
+
+create table board1(                     -- 스쿠버 교육신청
+    num number(5) primary key,      -- 게시글 교육번호
+    title varchar2(50),                     -- 게시글 제목
+    pass varchar2(50),                     -- 작성자 비밀번호
+    name varchar2(30),                   -- 작성자 이름
+    phone varchar2(13),                  -- 작성자 연락처
+    space number(2),                     -- 교육받을 장소
+    subject number(2),                   -- 희망하는 교육과정
+    pack number(2),                      -- 패키지
+    writedate date default sysdate,   --작성일자
+    readcount number(4) default 0,  --조회수
+    time number(2)                       -- 교육받기를 희망하는 시간
+);
+
+create table board2(                    --수강생 후기
+    num number(5) primary key,    --게시판 고유번호, 기본키로 설정
+    userid varchar(15),                  --회원 아이디
+    name varchar2(30),                 --작성자 이름(회원 정보에서 가져옴)
+    pass varchar2(30),                   --게시글 비밀번호(회원 비밀번호와 동일해야함)
+    title varchar2(50),                    --게시글 제목
+    pictureurl1 varchar2(50),           -- 사진1
+    pictureurl2 varchar2(50),  	     --사진2 
+    readcount number(4) default 0, --조회수
+    writedate date default sysdate, --작성일자    
+    content varchar2(1000)            --게시글 내용
+);
+
+create table board3(           -- 공지사항 게시판
+    num number(5) primary key, -- 게시판 고유번호, 기본키로 설정
+    userid varchar(15),	       -- 회원 아이디
+    name varchar2(30),         -- 작성자 이름(회원 정보에서 가져옴)
+    pass varchar2(30),         -- 게시글 비밀번호(회원 비밀번호와 동일해야함)
+    title varchar2(50),        -- 게시글 제목    
+    pictureurl1 varchar2(50),        -- 사진1
+    pictureurl2 varchar2(50),  	     -- 사진2 
+    writedate date default sysdate,  -- 작성일자
+    readcount number(4) default 0,   -- 조회수
+    content varchar2(1000)           -- 게시글 내용
+);
+
+create table board4(               --스쿠버 장비판매 게시판
+    num number(5) primary key, --게시판 고유번호, 기본키로 설정
+    userid varchar(15),	           --회원 아이디
+    name varchar2(30),             --작성자 이름(회원 정보에서 가져옴)
+    pass varchar2(30),             --게시글 비밀번호(회원 비밀번호와 동일해야함)
+    title varchar2(50),            --게시글 제목
+    pictureurl1 varchar2(50),	   --사진1   
+    pictureurl2 varchar2(50),      --사진2
+    readcount number(4) default 0, --조회수
+    writedate date default sysdate, --작성일자
+    content varchar2(1000)        --게시글 내용
+);
+
+create table bulletin( 	       -- 커뮤니티 사진 게시판
+    num number(5) primary key, -- 게시글 고유번호
+    pictureurl varchar2(50)    -- 사진
+);
+commit;
+drop sequence member_seq;
+drop sequence board1_seq;
+drop sequence board2_seq;
+drop sequence board3_seq;
+drop sequence board4_seq;
+drop sequence bulletin_seq;
+commit;
+create sequence member_seq start with 1 increment by 1;
+create sequence board1_seq start with 1 increment by 1;
+create sequence board2_seq start with 1 increment by 1;
+create sequence board3_seq start with 1 increment by 1;
+create sequence board4_seq start with 1 increment by 1;
+create sequence bulletin_seq start with 1 increment by 1;
+commit;
+insert into member values(member_seq.nextval,'admin','1234','운영자',1,'02-123-4567','010-1004-1004','scuba@scuba.com','서울 잠실수영장');
+insert into board3(num,name,pass,title,content) values(board3_seq.nextval,'운영자','1234','테스트','내용테스트');
+commit;
