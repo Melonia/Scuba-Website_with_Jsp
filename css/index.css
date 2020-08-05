@@ -1,0 +1,102 @@
+@charset "UTF-8";
+
+#index{
+	height:1500px;
+}
+#picture{
+	position:relative;
+	height:900px;
+}
+#picture>div{
+	position:absolute;
+	height:400px;
+}
+
+#picture> div img{
+	display:block;
+}
+
+#picture>div div:nth-child(2) img{
+	height:0px;
+}
+
+#picture>div div:nth-child(3) img{
+	height:0px;
+}
+
+.bullet{
+	position:absolute;
+	list-style: none;
+	margin-top:45%;
+	margin-left: 43%;
+	width:100px;
+	
+}
+.bullet>li{
+	float:left;
+	background-color:white;
+	width:8px;
+	height:8px;
+	margin-left:20px;
+	border-radius:50%;
+	transition: 1s;
+	
+}
+.bullet>li:nth-child(1):hover{
+	background-color:blue;
+}
+.bullet>li:nth-child(2):hover{
+	background-color:blue;
+}
+.bullet>li:nth-child(3):hover{
+	background-color:blue;
+}
+#product{
+	margin-top:50px;
+}
+#product>ul{
+	display:flex; 
+	flex-direction:row;
+	justify-content:center;
+}
+#product>ul li{
+	margin:0px 60px 0px 50px;
+	list-style: none;
+}
+/* 스톤 수정(2020.07.20_권재우) */
+#stone{
+	margin-top:130px;
+	margin-bottom:190px;
+	margin-left:195px;
+	padding-top:50px;
+}
+#stone>div{
+  padding:10; margin:10;
+  background-color:#bebebe;
+  border-radius: 25%;
+  padding:60px 40px 60px 40px;
+  display:inline;
+  Opacity:0.8;
+}
+#stone>div:nth-child(1){
+	font-size:15px;
+}
+#stone>div:nth-child(2){
+	margin-left:120px;
+	padding:60px 30px 60px 30px;
+	font-size:15px;
+}
+#stone>div:nth-child(3){
+	margin-left:120px;
+	font-size:15px;
+}
+#stone>div:nth-child(4){
+	margin-left:120px;
+	padding:60px 55px 60px 55px;
+	font-size:15px;
+}
+#stone>div:nth-child(5){
+	margin-left:120px;
+	padding:60px 55px 60px 55px;
+	font-size:15px;
+}

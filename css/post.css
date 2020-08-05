@@ -1,0 +1,117 @@
+@charset "UTF-8";
+#post{
+	position: relative;
+	height:1500px;
+}
+#post_content{
+	height:835.2px;
+	margin-top:140px;
+}
+#post_content > h1{
+	text-align: center;
+	margin-top:20px;
+	font-size:40px;
+}
+#post_list{
+	position:absolute;
+	/*visibility: hidden;*/
+	margin-top:50px;
+}
+#post_list > h1{
+	width:1701px;
+	text-align: center;
+}
+#post_list > form{
+	margin-left:30px;
+	width:1530px;
+	height:600px;
+}
+#post_list > form figure{
+	width:1500px;
+	margin-right:0;
+}
+#post_list > form h3{
+	text-align:left;
+}
+#post_list > form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:40px;
+}
+#post_list > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#post_list > form table thead{
+	background-color:#4695ed;
+	font-size:20px;
+	height:25px;
+}
+
+#post_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#post_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#post_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#post_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#post_list > form table tbody{
+	
+} 
+#post_list > form table tbody td{
+	text-align:center;
+}
+#post_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#post_application{
+	position:absolute;
+	visibility: hidden;
+	margin-top:50px;
+}
+#post_application form{
+	margin-left:60px;
+	width:1530px;
+	height:600px;
+}
+#post_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#post_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#post_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize : none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}

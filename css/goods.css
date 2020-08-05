@@ -1,0 +1,136 @@
+@charset "UTF-8";
+#goods{
+	position:relative;
+	height:1500px;
+}
+#goods_nav{
+	margin-top:100px;
+}
+#goods_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#goods_nav>ul li{
+	margin-left:50px;
+}
+#goods_nav>ul li button{
+	height:30px;
+	width:150px;
+	Opacity:0.8;
+	border:none;
+	
+}
+#goods_content{
+	height:835.2px;
+	margin-top:30px;
+}
+#goods_content > h1{
+	text-align:center;
+	font-size:40px;
+
+}
+#goods_content > p{
+	text-align:center;
+	letter-spacing: 0.3em;
+	font-size:20px;
+	font-weight: bolder;
+}
+#goods_list{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	/*visibility:hidden;*/
+}
+#goods_list > form{
+	width:1300px;
+	justify-content: center;
+	margin-left:180px;
+}
+#goods_list > form table{
+	margin:0 auto;
+	text-align: center;
+}
+#goods_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+	margin-top:20px;
+}
+#goods_application{
+	position:absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#goods_application form{
+	width:1530px;
+	height:600px;
+	margin-left:60px;
+}
+#goods_application form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#goods_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#goods_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize:none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+#goods_detail{
+	position:absolute;
+	width:1663px;
+	/*visibility:hidden;*/
+}
+#goods_etc{
+	position:absolute;
+	width:1663px;
+	visibility:hidden;
+}
+#goods_etc > ul{
+	margin-top:70px;
+	width:1500px;
+	display:flex;
+	flex-direction:row;
+	list-style: none;
+	
+}
+#goods_etc > ul li{
+	margin-left:170px;
+	background-color:#dcdcdc;
+	font-size:15px;
+	Opacity:0.8;
+}
+#goods_etc > ul li h2{
+	font-size:30px;
+}
+#goods_etc > ul li h3{
+	font-size:25px;
+}

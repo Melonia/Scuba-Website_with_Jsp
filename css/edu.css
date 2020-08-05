@@ -1,0 +1,176 @@
+@charset "UTF-8";
+#edu{
+	position:relative;
+	height:1500px;
+}
+#edu_nav{
+	margin-top:100px;
+}
+
+#edu_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#edu_nav>ul li{
+	margin-left:50px;
+}
+#edu_nav>ul li button{
+	height:30px;
+	width:150px;
+	border:none;
+	Opacity:0.8;
+}
+#edu_content{
+	height:835.2px;
+	width:1663px;
+}
+#edu_curriculum{
+	position: absolute;
+	width:1663px;
+	/*visibility:hidden;*/
+}
+#edu_curriculum > h1{
+	text-align:center;
+}
+
+#edu_curriculum > ul{
+	width:1600px;
+	margin-top:70px;
+	display:flex;
+	flex-direction:row;
+	align-content:flex-start; 
+	flex-wrap:wrap; 
+	overflow:auto;
+    list-style: none;
+
+}
+#edu_curriculum > ul li{
+	margin-left:70px;
+	background-color:#dcdcdc;
+	Opacity:0.8;
+}
+#edu_curriculum > ul li:nth-child(1){
+	margin-left:350px;
+}
+#edu_curriculum > ul li:nth-child(4){
+	margin-top:30px;
+	margin-left:520px;
+}
+#edu_curriculum > ul li:nth-child(5){
+	margin-top:30px;
+}
+#edu_curriculum > ul li h2,h3{
+	text-align:center;
+}
+.course{
+	text-align:center;
+}
+
+#edu_list{
+	width:1663px;
+	position:absolute;
+	margin-top:50px;
+	visibility: hidden;
+}
+#edu_list > h1{
+	width:1663px;
+	text-align: center;
+}
+#edu_list > form{
+	margin-left:30px;
+	width:1530px;
+	height:600px;
+}
+#edu_list > form figure{
+	width:1500px;
+	margin-right:0;
+}
+#edu_list > form h3{
+	text-align:left;
+}
+#edu_list > form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:34px;
+}
+#edu_list > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#edu_list > form table thead{
+	height:25px;
+	background-color:#4695ed;
+	font-size:20px;
+}
+#edu_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#edu_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#edu_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#edu_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#edu_list > form table tbody{
+	
+} 
+#edu_list > form table tbody td{
+	text-align:center;
+}
+
+#edu_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#edu_application {
+	position:absolute;
+	margin-top:50px;
+	width:1663px;
+	visibility: hidden;
+}
+#edu_application h1{
+	width:1663px;
+	text-align: center;
+}
+#edu_application > form {
+	margin-left:60px;
+	width:90%;
+	height:600px;
+}
+#edu_application > form h3{
+	text-align: left;
+}
+#edu_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#edu_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#edu_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+}

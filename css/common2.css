@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+/* fake footer */
+section{
+	background-image:url('../images/background.gif');
+	background-size: contain;
+	/*width: 1668px;
+	height: 2020px;*/
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+#footer{
+	background-color:#2BA5BA;
+	font-weight: bolder;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+	height:200px;
+	margin-top:100px;
+}
+
+#footer h3{
+	font-size:28px;
+}
+#footer ul{
+	list-style: none;
+	margin-top:70px;
+}
+#footer ul li{
+	float:left;
+    margin-left:200px;
+    margin-right:100px;
+}
+/* fake footer */

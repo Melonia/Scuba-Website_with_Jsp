@@ -1,0 +1,61 @@
+@charset "UTF-8";
+
+/* login.css */
+#form{
+	position: relative;
+	height:1500px;
+}
+#form_content{
+	height:835.2px;
+	margin-top:140px;
+}
+#login_form{
+	position: absolute;
+	width:100%;
+	margin-top:320px;
+}
+#login_form>h3{
+	font-size:40px;
+	margin-bottom: 30px;
+}
+#login_form>form table{
+	height:100px;
+	width:350px;
+}
+#login_form>form table th{
+	font-size:30px;
+}
+#login_form>form table td{
+	height:50px;
+}
+.button1{
+	margin-top:40px;
+	width:100px;
+	height:30px;
+	background-color:blue;
+	color:white;
+}
+.button2{
+	margin-top:40px;
+	margin-left:30px;
+	width:100px;
+	height:30px;
+}
+#join_form{
+	position: absolute;
+	width:100%;
+	margin-top:190px;
+	visibility:hidden;
+}
+
+#join_form>h3{
+	font-size:40px;
+	margin-bottom: 30px;
+}
+#join_form>form table{
+	height:350px;
+	width:500px;
+}
+#join_form>form table th{
+	font-size:20px;
+}

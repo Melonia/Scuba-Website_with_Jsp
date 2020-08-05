@@ -1,0 +1,235 @@
+@charset "UTF-8";
+#community{
+	position:relative;
+	width:1663px;
+	height:1500px;
+}
+#community_nav{
+	margin-top:100px;
+}
+#community_nav>ul{
+	margin-top:20px;
+	display:flex;
+	flex-direction:row;
+    justify-content: center;
+    list-style: none;
+    padding-right:50px;
+}
+#community_nav>ul li{
+	margin-left:50px;
+}
+#community_nav>ul li button{
+	height:30px;
+	width:150px;
+	Opacity:0.8;
+	border:none;
+}
+#community_content{
+	width:1663px;
+	height:835.2px;
+	margin-top:30px;
+}
+#community_list{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	/*visibility:hidden;*/
+}
+#community_list>h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_list>p{
+	text-align: center;
+}
+#community_list>form{
+	margin-top:70px;
+	width:1601px;
+	
+}
+#community_list>form figure{
+	width:1500px;
+	margin-left:100px;
+}
+#community_list>form figure h3{
+	text-align:left;
+}
+#community_list>form table{
+	border-collapse: collapse;
+	width:100%;
+	line-height:40px;
+}
+#community_list>form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#community_list>form table thead{
+	background-color:#4695ed;
+	font-size:20px;
+}
+#community_list>form table thead th{
+	height:40px;
+}
+#community_list > form table thead th:nth-child(1){
+	width:10%;
+}
+#community_list > form table thead th:nth-child(2){
+	width:60%;
+}
+#community_list > form table thead th:nth-child(3){
+    width:15%;
+}
+#community_list > form table thead th:nth-child(4){
+	width:15%;
+}
+#community_list > form table tbody td{
+	text-align:center;
+}
+#community_list > form input{
+	float:right;
+	width:70px;
+	height:25px;
+}
+#community_application{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_application h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_application p{
+	text-align: center;
+}
+#community_application form{
+	margin-top:50px;
+	margin-left:60px;
+	width:1530px;
+	height:600px;
+}
+#community_application > form table{
+	border-collapse: collapse;
+	width:100%;
+	height:540px;
+}
+#community_application > form table tr{
+	border:1px solid black;
+	border-left:none;
+	border-right:none;
+}
+#community_application > form table th{
+	background-color:#4695ed;
+	border-right:#4695ed;
+	border:#4695ed;
+	width:20%;
+}
+.content{
+	height:250px;
+	width:574px;
+	resize : none;
+}
+.button1{
+	margin-left:630px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+.button2{
+	margin-left:30px;
+	width:150px;
+	height:25px;
+	margin-top:20px;
+}
+#community_detail{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_detail > h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_detail > p{
+	text-align: center;
+}
+#community_board{
+	position: absolute;
+	width:1663px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_board > h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_board > p{
+	text-align: center;
+}
+#community_board > table{
+	width:1300px;
+	height:600px;
+	margin:0 auto;
+	margin-top:50px;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+#community_board >table tr{
+	height:300px;
+}
+#community_board > table td{
+	border:50px solid black;
+	padding:0px 0px 0px 0px;
+}
+#community_board > input{
+	margin-left:755px;
+	width:150px;
+	height:35px;
+	margin-top:40px;
+}
+#community_upload{
+	position: absolute;
+	width:1663px;
+	height:776px;
+	margin-top:50px;
+	visibility:hidden;
+}
+#community_upload h1{
+	font-size:20px;
+	text-align: center;
+	font-weight: bolder;
+}
+#community_upload p{
+	text-align: center;
+}
+#community_upload form{
+	margin-top:100px;
+	width:1663px;
+	height:550px;
+}
+#community_upload div{
+	position: relative;
+    width: 1663px;
+    height: 550px;
+    overflow: hidden;
+}
+#community_upload input:nth-child(1){
+	opacity: 0;
+    filter: alpha(opacity=0);
+    -ms-filter: "alpha(opacity=0)";
+    -khtml-opacity: 0;
+    -moz-opacity: 0;
+}
+#community_upload input:nth-child(2){
+	margin-left:755px;
+	width:150px;
+	height:35px;
+	margin-top:40px;
+}

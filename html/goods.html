@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SCUBA DIVERS</title>
+<link type="text/css" href="../css/common.css" rel="stylesheet">
+<link type="text/css" href="../css/common2.css" rel="stylesheet">
+<link type="text/css" href="../css/goods.css" rel="stylesheet">
+</head>
+<body>
+	<header>
+
+		<div id="login">
+			<ul>
+				<li><a href="../html/login.html">로그인</a></li>
+				<li><a href="../html/login.html">회원가입</a></li>	
+			</ul>
+		</div>
+
+		<div id="logo">
+		
+			<div align="center">
+				<a href="index.html">
+					<img src="../images/logo.png" align="middle">
+				</a>
+			</div>
+			
+			<div>
+				<img src="../images/cafe.png" align="right"> 
+				<img src="../images/kakao.png" align="right">
+				<img src="../images/instar.png" align="right">
+				<img src="../images/blog.png" align="right">
+			</div>
+		</div>
+		
+		<div id="nav">
+			<ul>
+				<li><a href="../html/intro.html">소개</a></li>
+				<li><a href="../html/edu.html">스쿠버다이빙 교육</a></li>
+				<li><a href="../html/post.html">후기</a></li>
+				<li><a href="../html/goods.html">상품</a></li>
+				<li><a href="../html/community.html">커뮤니티</a></li>
+			</ul>
+		</div>
+	</header>
+	
+<section id="goods">
+
+	<div id="header" align="center">
+		<img src="../images/header_logo.png" align="middle">
+	</div>	
+	
+	<div id="goods_nav">
+		<ul>
+			<li><button>스쿠버 장비</button></li>
+			<li><button>기타</button></li>
+		</ul>
+	</div>
+	
+	<div id="goods_content">
+		<h1><b>스쿠버 장비</b></h1><br><br><br>
+		<p>스쿠버다이빙 장비는 직접 파는것이 아니고 행사하는 상품을 한정적으로 판매하는 것이기 때문에</p>
+		<p>더욱 저렴하게 구입 가능합니다!</p>
+		<p>------------------------------------------------------------------------------</p>
+		<div id="goods_list">
+		
+			<form action="goods.html"method="post">
+			
+				<table>
+					<tr>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>호흡기세트</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>스쿠버다이빙 슈트 5mm</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>롤백</td>
+					</tr>
+					<tr>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>스쿠버전용 마스크</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>마스크 김서림 방지액</td>
+						<td><img src="../images/ddoongE.png"><br>행사상품.<br>내 관심</td>
+					</tr>
+				</table>
+				<input type="button" value="글쓰기">
+			</form>
+		</div>
+		
+		<div id="goods_application">
+		<form action="goods.html" method="post">
+			<table>
+				<tr>
+					<th>이름</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="이름을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>비밀번호</th>
+					<td>&nbsp;&nbsp;<input type="password" size="40" placeholder="비밀번호를 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>제목</th>
+					<td>&nbsp;&nbsp;<input type="text" size="40" placeholder="제목을 입력해주세요"></td>
+				</tr>
+				<tr>
+					<th>내용(최대 300자)</th>
+					<td>&nbsp;&nbsp;<textarea class="form-control" rows="20" name="bo_content" id="bo_content">${smarteditorVO.bo_content}</textarea></td>
+				</tr>
+				<tr>
+					<th>첨부파일1</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>
+				<tr>
+					<th>첨부파일2</th>
+					<td>&nbsp;&nbsp;<input type="file"></td>
+				</tr>				
+			</table>
+			<input class="button1" type="submit" value="작성">
+			<input class="button2" type="reset" value="취소">
+		</form>
+		</div>
+		
+		<div id="goods_detail">
+		
+	
+		</div>
+		
+		<div id="goods_etc">
+			<ul>
+				<li>
+					<br>
+					<h2 style='color:#ff0a00'><b>스쿠버다이빙 장비 세트</b></h2>
+					<h3><b>40,000원 (1일)</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<p>부츠, 장갑, 모자</p>
+					<p>호흡기, BCD</p>
+					<br><br>		
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>슈트</p>
+					<p>마스크</p>
+					<p>스노쿨</p>
+					<br><br><br><br><br>
+				</li>
+				<li>
+					<br>
+					<h2 style="color:#ff0a00"><b>프리다이빙 장비 세트</b></h2>
+					<h3><b>15,000원 (1일))</b></h3>
+					<br>
+					<p>-----------------------------------</p>
+					<br>
+					<br>
+					<p>-- 구성품 --</p>
+					<p>랜턴</p>
+					<br><br><br><br><br><br><br>					
+				</li>
+			</ul>
+		
+		</div>
+	
+	</div>
+	
+	<div id="footer">
+			
+				<ul>
+					<li>
+			<h3>공지사항</h3>
+			<p>--------------------------</p>
+			<p>2020년 투어 계획</p>
+			<p>스쿠버다이빙 상품 할인 이벤...</p>
+		
+		</li>
+		<li>
+			<h3>교육문의</h3>
+			<p>--------------------------</p>
+			<p>-스쿠버교육 문의 드립니다.</p>
+			<p>-프리다이빙 교육 문의드려요~</p>
+			<p>-문의합니다...</p>
+		</li>
+		<li>
+			<h3>고객센터</h3>
+			<p>대표전화</p>
+			<p>tel) 010.1111.1111</p>
+			<img src=../images/kakao.png>
+			<p>카카오톡ID : Scuba</p>
+		</li>
+	</ul>
+	
+	</div>
+	
+	</section>
+
+
+	<footer>
+		<div>
+			<address>주소 : 서울 성북구 행복동 행복한집 102-11</address>
+			<p>Tel : 010-1111-1111</p>
+			<p>대표 : QWERTY</p>
+			<p>사업자등록번호 : 000-00-00000</p> 
+		</div>
+	</footer>
+
+</body>
+</html>
